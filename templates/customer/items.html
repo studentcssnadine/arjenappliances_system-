@@ -1,0 +1,1059 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Items - Arjen Appliances Trading</title>
+    <link rel="icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar - aligned with admin/staff */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile hamburger styles on dark navbar */
+        .navbar #sidebarToggle {
+            border: 1px solid rgba(255,255,255,0.45);
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+        }
+        .navbar #sidebarToggle i { color: #ffffff; }
+        .navbar #sidebarToggle:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand img.logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .user-menu { display: flex; align-items: center; gap: 1rem; }
+        /* Use shared user_profile_dropdown styles; no page overrides here */
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: var(--shadow);
+            padding: 2rem 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 0.5rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #f8f9fa;
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .page-title {
+            margin: 0 0 0.5rem 0;
+            color: var(--dark);
+            font-size: 1.8rem;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb i {
+            margin: 0 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        /* Customer Info Card */
+        .customer-info-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .customer-info-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 2rem;
+        }
+
+        .customer-name {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .customer-details {
+            padding: 2rem 2.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-item i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+        }
+
+        .item-card.clickable-item:hover {
+            background: #e3f2fd !important;
+            border-color: #1976d2 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border-left: 4px solid #ddd;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .summary-card.success {
+            border-left-color: var(--success);
+        }
+
+        .summary-card.danger {
+            border-left-color: var(--danger);
+        }
+
+        .summary-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .summary-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .summary-card p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Progress Container */
+        .progress-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-header h3 {
+            margin: 0;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .progress-header span {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem 3rem;
+            background: #f8f9fa;
+            overflow-y: auto;
+            max-width: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #27ae60);
+            transition: width 0.5s ease;
+        }
+
+        /* Payment Table Container */
+        .payment-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 2rem;
+        }
+
+        .table-title {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .payment-table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .payment-table-container th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #e9ecef;
+            white-space: nowrap;
+        }
+
+        .payment-table-container td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        .payment-row:hover {
+            background: #f8f9fa;
+        }
+
+        .currency {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.overdue {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .payment-table-container table { font-size: 0.8rem; }
+            .payment-table-container th,
+            .payment-table-container td { padding: 0.75rem 0.5rem; }
+            /* Horizontal scroll for wide tables on small screens */
+            .payment-table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .payment-table-container table { min-width: 720px; }
+        }
+
+        .no-items {
+            text-align: center;
+            padding: 4rem;
+            color: #666;
+        }
+
+        .no-items i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; }
+
+            .navbar {
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .brand {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            /* Compact toolbar icons on mobile */
+            .navbar #sidebarToggle {
+                margin-left: auto;
+                margin-right: 0.25rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+            }
+
+            .navbar #sidebarToggle i {
+                font-size: 1.1rem;
+            }
+
+            .navbar .user-menu {
+                order: 3;
+            }
+
+            .navbar .user-profile-dropdown .user-info-display {
+                padding: 0 !important;
+                width: 40px;
+                height: 40px;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+                justify-content: center;
+            }
+
+            .navbar .user-profile-dropdown .dropdown-arrow {
+                display: none;
+            }
+
+            .content {
+                padding: 1rem 0.75rem;
+            }
+
+            .page-header,
+            .customer-info-card,
+            .summary-grid,
+            .progress-container,
+            .payment-table-container {
+                margin-bottom: 1.5rem;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .items-grid { grid-template-columns: 1fr; }
+            .item-card { padding: 1.5rem; }
+        }
+
+        /* Mobile sidebar overlay */
+        #mobileSidebarOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            z-index: 3500;
+        }
+
+        /* Off-canvas sidebar for tablets/phones */
+        @media (max-width: 992px) {
+            .main-container { flex-direction: column; }
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                transform: translateX(-100%);
+                width: 260px;
+                height: calc(100vh - 60px);
+                background: #ffffff;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+                transition: transform 0.3s ease;
+                z-index: 4000;
+                overflow-y: auto;
+            }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open #mobileSidebarOverlay { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo" class="logo">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <button id="sidebarToggle" class="btn btn-outline" aria-label="Toggle sidebar" style="display:none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <div id="mobileSidebarOverlay" aria-hidden="true"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'customer_dashboard' %}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_transactions' %}" class="nav-link">
+                        <i class="fas fa-credit-card"></i>
+                        <span>All Transactions</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_items' %}" class="nav-link active">
+                        <i class="fas fa-box"></i>
+                        <span>My Items</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">My Items</h1>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="customer-info-card">
+                <div class="customer-info-header">
+                    <h2 class="customer-name">{{ customer.customers_name }}</h2>
+                </div>
+                <div class="customer-details">
+                    <div class="detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ customer.address }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ customer.contact }}</span>
+                    </div>
+                    {% if customer_items %}
+                        {% for item in customer_items %}
+                        <div class="item-card clickable-item" 
+                             data-item-id="{{ item.id }}"
+                             data-item-name="{{ item.item_name }} {{ item.item_model }}"
+                             data-total-paid="{{ item.total_paid|default:0 }}"
+                             data-remaining-balance="{{ item.remaining_balance|default:item.total_contract_amount }}"
+                             data-payments-made="{{ item.payments_made|default:0 }}"
+                             data-payments-remaining="{{ item.payments_remaining|default:item.term_months }}"
+                             data-payment-progress="{{ item.payment_progress|default:0 }}"
+                             data-delivery-date="{{ item.purchase_date|date:'M d, Y' }}"
+                             onclick="selectItem(this)"
+                             style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s ease;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                                <i class="fas fa-box" style="color: #1e3a8a; font-size: 1.2rem;"></i>
+                                <div style="font-weight: 600; color: #1e3a8a; font-size: 1.1rem;">{{ item.item_name|default:"Item" }} {{ item.item_model|default:"Standard Model" }}</div>
+                                <i class="fas fa-chevron-right" style="margin-left: auto; color: #6c757d; font-size: 0.9rem;"></i>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-left: 32px;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Monthly Due</span>
+                                    <span style="font-weight: 600; color: #28a745; font-size: 1rem;">₱{{ item.monthly_due|floatformat:2 }}</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Balance</span>
+                                    <span style="font-weight: 600; color: #dc3545; font-size: 1rem;">₱{{ item.remaining_balance|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="detail-item">
+                            <i class="fas fa-box"></i>
+                            <span style="color: #666;">No items listed</span>
+                        </div>
+                    {% endif %}
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Delivered: {{ customer.date_delivered|date:"M d, Y"|default:"Not set" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="summary-grid">
+                <div class="summary-card success">
+                    <h3>₱{{ total_paid|floatformat:2 }}</h3>
+                    <p>Total Paid</p>
+                </div>
+                <div class="summary-card {% if total_remaining_balance > 0 %}danger{% else %}success{% endif %}">
+                    <h3>₱{{ total_remaining_balance|floatformat:0 }}</h3>
+                    <p>Remaining Balance</p>
+                </div>
+                <div class="summary-card">
+                    <h3>{{ total_payments_made }} / {{ total_term_months }}</h3>
+                    <p>Payments Made</p>
+                </div>
+                <div class="summary-card {% if payments_remaining > 0 %}warning{% else %}success{% endif %}">
+                    <h3>{{ payments_remaining }}</h3>
+                    <p>Payments Remaining</p>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h3><i class="fas fa-chart-line"></i> Payment Progress</h3>
+                    <span>{{ payment_percentage|floatformat:0 }}% Complete</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ payment_percentage }}%"></div>
+                </div>
+            </div>
+
+            <!-- Payment Breakdown -->
+            <div class="payment-table-container">
+                <div class="table-header">
+                    <h2 class="table-title">
+                        <i class="fas fa-list"></i> Payment Breakdown
+                    </h2>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction #</th>
+                            <th>Due Date</th>
+                            <th>Date Paid / Time</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Rebate</th>
+                            <th>Status</th>
+                            <th>Balance</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in customer_items %}
+                            {% for payment in item.payment_records %}
+                            <tr class="payment-row" data-item-id="{{ item.id }}">
+                                <td>{{ payment.transaction_number }}</td>
+                                <td>{{ payment.due_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if payment.payment_date %}
+                                        <div>
+                                            <div>{{ payment.payment_date|date:"M d, Y" }}</div>
+                                            {% if payment.created_at %}
+                                                <div style="font-size: 0.8rem; color: #6b7280;">{{ payment.created_at|date:"h:i:s A" }}</div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span style="color: #999;">Not paid</span>
+                                    {% endif %}
+                                </td>
+                                <td>₱{{ payment.amount_paid|floatformat:2 }}</td>
+                                <td>{{ payment.payment_method }}</td>
+                                <td>
+                                    {% if payment.rebate_amount and payment.rebate_amount > 0 %}
+                                        ₱{{ payment.rebate_amount|floatformat:2 }}
+                                    {% else %}
+                                        <span style="color: #999;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="status-badge {% if payment.status == 'PAID' %}paid{% elif payment.status == 'OVERDUE' %}overdue{% else %}pending{% endif %}">{{ payment.status }}</span>
+                                </td>
+                                <td>₱{{ payment.running_balance|floatformat:0 }}</td>
+                                <td>
+                                    {% if payment.notes %}
+                                        {{ payment.notes }}
+                                    {% else %}
+                                        <span style="color: #999;">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if item.show_remaining_row %}
+                            <tr class="payment-row remaining-balance-row" data-item-id="{{ item.id }}" style="background-color: #fffbe6;">
+                                <td>-</td>
+                                <td>-</td>
+                                <td><span style="color: #666; font-weight: 600;">Remaining Balance (last payment partial)</span></td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td><span class="status-badge pending">PENDING</span></td>
+                                <td>₱{{ item.remaining_balance|floatformat:0 }}</td>
+                                <td>-</td>
+                            </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="9" style="text-align: center; color: #999; padding: 2rem;">
+                                    No payment records found
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Customer Profile Modal -->
+    {% include 'modals/customer_profile_modal.html' %}
+
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            function updateHamburger() {
+                if (!toggleBtn) return;
+                if (window.innerWidth <= 992) {
+                    toggleBtn.style.display = 'inline-flex';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+            updateHamburger();
+            window.addEventListener('resize', updateHamburger);
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-open');
+                });
+            }
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+        })();
+
+        let selectedItemId = null;
+
+        function selectItem(element) {
+            try {
+                // Remove active class from all items
+                document.querySelectorAll('.clickable-item').forEach(item => {
+                    item.style.background = '#f8f9fa';
+                    item.style.borderColor = '#e9ecef';
+                });
+                
+                // Add active class to selected item
+                element.style.background = '#e3f2fd';
+                element.style.borderColor = '#1976d2';
+                
+                // Get item data
+                const itemId = element.dataset.itemId;
+                const itemName = element.dataset.itemName;
+                const totalPaid = parseFloat(element.dataset.totalPaid) || 0;
+                const remainingBalance = parseFloat(element.dataset.remainingBalance) || 0;
+                const paymentsMade = parseInt(element.dataset.paymentsMade) || 0;
+                const paymentsRemaining = parseInt(element.dataset.paymentsRemaining) || 0;
+                const paymentProgress = parseFloat(element.dataset.paymentProgress) || 0;
+                
+                selectedItemId = itemId;
+                
+                console.log('Selected item:', {
+                    itemId, itemName, totalPaid, remainingBalance, 
+                    paymentsMade, paymentsRemaining, paymentProgress
+                });
+                
+                // Update summary cards with item-specific data
+                updateSummaryCards(totalPaid, remainingBalance, paymentsMade, paymentsRemaining);
+                
+                // Update progress bar
+                updateProgressBar(paymentProgress);
+                
+                // Hide "no item selected" message
+                hideNoItemSelectedMessage();
+                
+                // Filter payment table to show only payments for this item
+                filterPaymentTable(itemId);
+                
+                // Update delivery date display
+                updateDeliveryDate(itemId, element.dataset.deliveryDate);
+                
+            } catch (error) {
+                console.error('Error in selectItem:', error);
+            }
+        }
+
+        function updateSummaryCards(totalPaid, remainingBalance, paymentsMade, paymentsRemaining) {
+            try {
+                const cards = document.querySelectorAll('.summary-card');
+                
+                // Update Total Paid (first card)
+                if (cards[0]) {
+                    const h3 = cards[0].querySelector('h3');
+                    if (h3) {
+                        h3.textContent = '₱' + totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2});
+                    }
+                }
+                
+                // Update Remaining Balance (second card)
+                if (cards[1]) {
+                    const h3 = cards[1].querySelector('h3');
+                    if (h3) {
+                        h3.textContent = '₱' + remainingBalance.toLocaleString('en-US', {minimumFractionDigits: 0});
+                    }
+                    // Update card color based on balance
+                    if (remainingBalance > 0) {
+                        cards[1].className = 'summary-card danger';
+                    } else {
+                        cards[1].className = 'summary-card success';
+                    }
+                }
+                
+                // Update Payments Made (third card)
+                if (cards[2]) {
+                    const h3 = cards[2].querySelector('h3');
+                    if (h3) {
+                        const totalTerm = paymentsMade + paymentsRemaining;
+                        h3.textContent = `${paymentsMade} / ${totalTerm}`;
+                    }
+                }
+                
+                // Update Payments Remaining (fourth card)
+                if (cards[3]) {
+                    const h3 = cards[3].querySelector('h3');
+                    if (h3) {
+                        h3.textContent = paymentsRemaining.toString();
+                    }
+                    // Update card color based on remaining payments
+                    if (paymentsRemaining > 0) {
+                        cards[3].className = 'summary-card warning';
+                    } else {
+                        cards[3].className = 'summary-card success';
+                    }
+                }
+                
+                console.log('Summary cards updated successfully');
+            } catch (error) {
+                console.error('Error updating summary cards:', error);
+            }
+        }
+
+        function updateProgressBar(percentage) {
+            try {
+                const progressFill = document.querySelector('.progress-fill');
+                const progressText = document.querySelector('.progress-header span');
+                
+                if (progressFill) {
+                    progressFill.style.width = percentage + '%';
+                }
+                
+                if (progressText) {
+                    progressText.textContent = Math.round(percentage) + '% Complete';
+                }
+                
+                console.log('Progress bar updated to:', percentage + '%');
+            } catch (error) {
+                console.error('Error updating progress bar:', error);
+            }
+        }
+
+        function filterPaymentTable(itemId) {
+            try {
+                const paymentRows = document.querySelectorAll('.payment-row');
+                let visibleCount = 0;
+                
+                paymentRows.forEach(row => {
+                    const rowItemId = row.dataset.itemId;
+                    
+                    // Show row if it matches the selected item or has no item ID (general payments)
+                    if (!itemId || !rowItemId || rowItemId === itemId) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                console.log(`Filtered payment table: ${visibleCount} rows visible for item ${itemId}`);
+                
+                // Show message if no payments found
+                if (visibleCount === 0) {
+                    showNoPaymentsMessage();
+                } else {
+                    hideNoPaymentsMessage();
+                }
+            } catch (error) {
+                console.error('Error filtering payment table:', error);
+            }
+        }
+
+        function updateDeliveryDate(itemId, deliveryDate) {
+            try {
+                const deliveryElement = document.querySelector('.detail-item:last-child span:last-child');
+                if (deliveryElement && deliveryDate) {
+                    deliveryElement.textContent = `Delivered: ${deliveryDate}`;
+                    console.log('Updated delivery date to:', deliveryDate);
+                }
+            } catch (error) {
+                console.error('Error updating delivery date:', error);
+            }
+        }
+
+        function showNoPaymentsMessage() {
+            const tableBody = document.querySelector('.payment-table-container tbody');
+            if (tableBody && !document.querySelector('.no-payments-message')) {
+                const messageRow = document.createElement('tr');
+                messageRow.className = 'no-payments-message';
+                messageRow.innerHTML = `
+                    <td colspan="9" style="text-align: center; color: #999; padding: 2rem; font-style: italic;">
+                        No payments found for the selected item
+                    </td>
+                `;
+                tableBody.appendChild(messageRow);
+            }
+        }
+
+        function hideNoPaymentsMessage() {
+            const messageRow = document.querySelector('.no-payments-message');
+            if (messageRow) {
+                messageRow.remove();
+            }
+        }
+
+        function resetToAllItems() {
+            try {
+                // Reset item selection
+                selectedItemId = null;
+                document.querySelectorAll('.clickable-item').forEach(item => {
+                    item.style.background = '#f8f9fa';
+                    item.style.borderColor = '#e9ecef';
+                });
+                
+                // Reset to zero state (like admin payment history)
+                updateSummaryCards(0, 0, 0, 0);
+                updateProgressBar(0);
+                
+                // Hide all payment rows
+                document.querySelectorAll('.payment-row').forEach(row => {
+                    row.style.display = 'none';
+                });
+                
+                // Show "no item selected" message
+                hideNoPaymentsMessage();
+                showNoItemSelectedMessage();
+                
+                console.log('Reset to zero state - no item selected');
+            } catch (error) {
+                console.error('Error resetting to zero state:', error);
+            }
+        }
+
+        // Initialize page with zeros (like admin payment history)
+        function initializePage() {
+            try {
+                // Set all summary cards to 0 (no item selected)
+                updateSummaryCards(0, 0, 0, 0);
+                
+                // Set progress bar to 0
+                updateProgressBar(0);
+                
+                // Hide all payment rows initially (no item selected)
+                document.querySelectorAll('.payment-row').forEach(row => {
+                    row.style.display = 'none';
+                });
+                
+                // Show "No item selected" message
+                showNoItemSelectedMessage();
+                
+                console.log('Page initialized with zeros - no item selected');
+            } catch (error) {
+                console.error('Error initializing page:', error);
+            }
+        }
+
+        function showNoItemSelectedMessage() {
+            const tableBody = document.querySelector('.payment-table-container tbody');
+            if (tableBody && !document.querySelector('.no-item-selected-message')) {
+                const messageRow = document.createElement('tr');
+                messageRow.className = 'no-item-selected-message';
+                messageRow.innerHTML = `
+                    <td colspan="9" style="text-align: center; color: #666; padding: 3rem; font-size: 1.1rem;">
+                        <i class="fas fa-mouse-pointer" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem; display: block;"></i>
+                        Click on an item above to view its payment details
+                    </td>
+                `;
+                tableBody.appendChild(messageRow);
+            }
+        }
+
+        function hideNoItemSelectedMessage() {
+            const messageRow = document.querySelector('.no-item-selected-message');
+            if (messageRow) {
+                messageRow.remove();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Initialize with zeros (like admin payment history)
+                initializePage();
+                
+                // Add hover effects to item cards
+                const itemCards = document.querySelectorAll('.clickable-item');
+                itemCards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        if (this.dataset.itemId !== selectedItemId) {
+                            this.style.backgroundColor = '#e8f2ff';
+                            this.style.borderColor = '#b3d9ff';
+                        }
+                    });
+                    
+                    card.addEventListener('mouseleave', function() {
+                        if (this.dataset.itemId !== selectedItemId) {
+                            this.style.backgroundColor = '#f8f9fa';
+                            this.style.borderColor = '#e9ecef';
+                        }
+                    });
+                });
+                
+                // Add double-click to reset
+                document.addEventListener('dblclick', function(e) {
+                    if (!e.target.closest('.clickable-item')) {
+                        resetToAllItems();
+                    }
+                });
+                
+                console.log('Customer payment history initialized successfully');
+            } catch (error) {
+                console.error('Error initializing page:', error);
+            }
+        });
+    </script>
+</body>
+</html>

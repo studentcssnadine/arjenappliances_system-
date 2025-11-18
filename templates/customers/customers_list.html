@@ -1,0 +1,1554 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management - Arjen Appliances Trading</title>
+    <link rel="icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --text: #333;
+            --text-light: #777;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile hamburger styles on dark navbar (desktop base) */
+        .navbar #sidebarToggle {
+            border: 1px solid rgba(255,255,255,0.45);
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+        }
+        .navbar #sidebarToggle i { color: #ffffff; }
+        .navbar #sidebarToggle:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand img {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            font-weight: 500;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: var(--shadow);
+            padding: 2rem 0;
+        }
+
+        .menu-items {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin: 0.5rem 0;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item.active a,
+        .menu-item a:hover {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-item {
+            border-top: 1px solid #e0e0e0;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .logout-item a {
+            color: #dc3545 !important;
+        }
+
+        .logout-item:hover a {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border-left-color: #dc3545 !important;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--dark);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Customer Table Container */
+        .customer-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-title {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .table-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Search Form */
+        .search-form {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .search-container:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+
+        .search-input {
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            outline: none;
+            width: 250px;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background: #1e40af;
+        }
+
+        .clear-search-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            margin-left: 0.5rem;
+        }
+
+        .clear-search-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        /* Search Results Info */
+        .search-results-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 2rem;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .search-results-info i {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        /* Add Customer Button */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 1rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Make table text black */
+        td {
+            color: #000000 !important;
+        }
+
+        td strong {
+            color: #000000 !important;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .btn-info {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #2980b9;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268, #495057);
+        }
+
+        /* Currency Formatting */
+        .currency {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        /* No Data Message */
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .sidebar { width: 220px; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; }
+            .content { padding: 1rem; }
+            .table-header { flex-direction: column; align-items: stretch; }
+            .table-controls { justify-content: center; }
+            .search-input { width: 200px; }
+            table { font-size: 0.8rem; }
+            th, td { padding: 0.5rem 0.25rem; }
+            /* Enable horizontal scroll for wide tables */
+            .customer-table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .customer-table-container table { min-width: 900px; }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 10000 !important;
+            padding: 2rem !important;
+            overflow-y: auto !important;
+        }
+
+        .modal-container {
+            max-width: 800px !important;
+            width: 90% !important;
+            max-height: 90vh !important;
+            background: white !important;
+            border-radius: 20px !important;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25) !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+            margin: auto !important;
+            position: relative !important;
+            animation: modalAppear 0.3s ease-out !important;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: calc(90vh - 120px);
+        }
+
+        .form-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 2rem;
+            max-height: calc(90vh - 200px);
+        }
+
+        .form-buttons {
+            flex-shrink: 0;
+            padding: 1rem 2rem;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        /* Custom scrollbar for modal forms */
+        .form-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .form-grid::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .form-grid::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+            color: white !important;
+            padding: 1.5rem 2rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Specific targeting for modal headers */
+        #addCustomerModal .modal-header,
+        #addItemModal .modal-header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+            color: white !important;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        /* Form Grid Styles - Matching PHP */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group small {
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 1rem;
+        }
+
+        /* Enhanced Items Display */
+        .items-container {
+            min-height: 20px;
+        }
+
+        .item-row {
+            padding: 2px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-items {
+            margin-top: 5px;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+        }
+
+        .item-details {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 0.85rem;
+        }
+
+        .item-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+
+        .item-details .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .edit-item-btn {
+            margin-left: 8px;
+            padding: 1px 4px;
+            font-size: 0.7rem;
+            border-radius: 3px;
+        }
+
+        .btn-xs {
+            padding: 1px 4px;
+            font-size: 0.7rem;
+            line-height: 1.2;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+
+            /* Off-canvas sidebar layout similar to admin dashboard */
+            .sidebar {
+                width: 260px;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                transform: translateX(-100%);
+                height: calc(100vh - 60px);
+                background: #ffffff;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+                transition: transform 0.3s ease;
+                z-index: 4000;
+                overflow-y: auto;
+            }
+
+            .navbar {
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .brand {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            /* Compact circular hamburger + profile icons */
+            .navbar #sidebarToggle {
+                margin-left: auto;
+                margin-right: 0.25rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+            }
+
+            .navbar #sidebarToggle i {
+                font-size: 1.1rem;
+            }
+
+            .navbar .user-menu {
+                order: 3;
+            }
+
+            .navbar .user-profile-dropdown .user-info-display {
+                padding: 0 !important;
+                width: 40px;
+                height: 40px;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+                justify-content: center;
+            }
+
+            .navbar .user-profile-dropdown .dropdown-arrow {
+                display: none;
+            }
+
+            .content { padding: 1rem 0.75rem; }
+
+            .table-header {
+                padding: 1.25rem 1.5rem;
+            }
+
+            /* Enable horizontal scroll for wide customer tables */
+            .customer-table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .customer-table-container table { min-width: 960px; }
+        }
+
+        /* Mobile sidebar overlay for admin customers list */
+        #mobileSidebarOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            z-index: 3500;
+        }
+
+        @media (max-width: 768px) {
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open #mobileSidebarOverlay { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <button id="sidebarToggle" class="btn btn-outline" aria-label="Toggle sidebar" style="display:none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <div id="mobileSidebarOverlay" aria-hidden="true"></div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        {% include 'includes/staff_admin_sidebar.html' %}
+
+        <!-- Content Area -->
+        <main class="content">
+            <div class="page-header">
+                <h1 class="page-title">Customer Management</h1>
+            </div>
+
+            <!-- Success/Error Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Customer List -->
+            <div class="customer-table-container">
+                <div class="table-header">
+                    <h2 class="table-title">Customer List</h2>
+                    <div class="table-controls">
+                        <!-- Search Bar -->
+                        <form method="GET" class="search-form">
+                            <div class="search-container">
+                                <input type="text" name="search" placeholder="Search customers..." value="{{ search_query }}" class="search-input">
+                                <button type="submit" class="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                {% if search_query %}
+                                <a href="{% url 'customers_list' %}" class="clear-search-btn" title="Clear search">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </form>
+                        {% if user.role == 'admin' or user.role == 'staff' %}
+                        <button id="addCustomerBtn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add New Customer
+                        </button>
+                        <button id="addItemBtn" class="btn btn-success" style="margin-left: 10px; background: linear-gradient(135deg, #28a745, #20c997); border: none; box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);" onclick="showAddItemModal()">
+                            <i class="fas fa-plus"></i> Add Item to Customer
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if search_query %}
+                <div class="search-results-info">
+                    <i class="fas fa-search"></i>
+                    Search results for: <strong>"{{ search_query }}"</strong>
+                    ({{ search_results_count }} result{{ search_results_count|pluralize }} found)
+                </div>
+                {% endif %}
+                
+                {% if customers %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Contact</th>
+                            <th>Date Delivered</th>
+                            <th>Item Name</th>
+                            <th>Item Model</th>
+                            <th>Original Price</th>
+                            <th>Downpayment</th>
+                            <th>Term</th>
+                            <th>Monthly Due</th>
+                            <th>Rebates</th>
+                            <th>Gross Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td>{{ customer.id }}</td>
+                            <td><strong>{{ customer.customers_name }}</strong></td>
+                            <td>{{ customer.address }}</td>
+                            <td>{{ customer.contact }}</td>
+                            <td>
+                                {% if customer.active_items %}
+                                    {% for item in customer.active_items %}
+                                        <div style="margin-bottom: 2px;">
+                                            <span style="font-size: 0.9rem; font-weight: 500;">{{ item.purchase_date|date:"M d, Y" }}</span>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {{ customer.date_delivered|date:"M d, Y" }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row">
+                                            <strong>{{ item.item_name }}</strong>
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        No items
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row">
+                                            {{ item.item_model }}
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="currency">
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row">
+                                            ₱{{ item.original_price|floatformat:2 }}
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        ₱0.00
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="currency">
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row">
+                                            ₱{{ item.downpayment|floatformat:2 }}
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        ₱0.00
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row">
+                                            {{ item.term_months }} months
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        0 months
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="currency">
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row">
+                                            ₱{{ item.monthly_due|floatformat:2 }}
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        ₱0.00
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="currency">
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row">
+                                            ₱{{ item.rebate_amount|floatformat:2 }}
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        ₱0.00
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="currency">
+                                <div class="items-container">
+                                    {% if customer.active_items %}
+                                        {% for item in customer.active_items %}
+                                        <div class="item-row" title="{% if item.good_as_cash == 'yes' %}Original Price (₱{{ item.original_price|floatformat:2 }}) - Rebate (₱{{ item.rebate_amount|floatformat:2 }}){% else %}(₱{{ item.monthly_due|floatformat:2 }} × {{ item.term_months }} months) + ₱{{ item.downpayment|floatformat:2 }} downpayment - ₱{{ item.rebate_amount|floatformat:2 }} rebate{% endif %}">
+                                            ₱{{ item.total_contract_amount|floatformat:2 }}
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        ₱0.00
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'edit_customer' customer.id %}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'customer_payments' customer.id %}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-money-bill-wave"></i> Payments
+                                    </a>
+                                    {% if user.role == 'admin' %}
+                                    <button class="btn btn-danger btn-sm remove-customer-btn" data-customer-id="{{ customer.id }}" data-customer-name="{{ customer.customers_name }}">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="no-data">
+                    <i class="fas fa-users"></i>
+                    <h3>No customers found</h3>
+                    <p>{% if search_query %}No customers match your search criteria.{% else %}Start by adding your first customer.{% endif %}</p>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Add Item to Customer</h2>
+                <span class="close" onclick="closeAddItemModal()">&times;</span>
+            </div>
+            <form id="addItemForm" method="POST" action="{% url 'add_item_modal_content' %}" class="modal-form">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="customer_id">Select Customer</label>
+                        <select name="customer_id" id="customer_id" required>
+                            <option value="">Choose a customer...</option>
+                            {% for customer in customers %}
+                                {% if customer.active_items|length >= 3 %}
+                                    <option value="{{ customer.id }}" disabled style="color: #dc3545; background: #f8d7da;">
+                                        {{ customer.customers_name }} ({{ customer.active_items|length }}/3 items) - LIMIT REACHED
+                                    </option>
+                                {% else %}
+                                    <option value="{{ customer.id }}">
+                                        {{ customer.customers_name }} ({{ customer.active_items|length }}/3 items)
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="item_name">Item Name</label>
+                        <input type="text" name="item_name" id="item_name" placeholder="e.g., Samsung, LG, Haier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="item_model">Item Model</label>
+                        <input type="text" name="item_model" id="item_model" placeholder="e.g., Refrigerator 36CX575" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="original_price">Original Price (Cash Price) (₱)</label>
+                        <input type="number" step="0.01" name="original_price" id="original_price" placeholder="Actual item price if paid in cash" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="downpayment">Downpayment (₱)</label>
+                        <input type="number" step="0.01" name="downpayment" id="downpayment" placeholder="Initial payment amount" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="good_as_cash">Good as Cash</label>
+                        <select name="good_as_cash" id="good_as_cash" required>
+                            <option value="">Choose...</option>
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rebate_amount">Rebate Amount (₱)</label>
+                        <input type="number" step="0.01" name="rebate_amount" id="rebate_amount" placeholder="Rebate amount" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="monthly_due">Monthly Payment (₱)</label>
+                        <input type="number" step="0.01" name="monthly_due" id="monthly_due" placeholder="Monthly installment amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="term_months">Term (Months)</label>
+                        <input type="number" name="term_months" id="term_months" min="1" max="60" placeholder="Enter number of months" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchase_date">Purchase Date</label>
+                        <input type="date" name="purchase_date" id="purchase_date" required>
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" name="add_item" class="btn btn-primary">Add Item to Customer</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddItemModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Remove Customer Modal -->
+    {% include 'modals/remove_customer_modal.html' %}
+
+    <!-- Edit Item Modal Container -->
+    <div id="editItemModalContainer"></div>
+
+    <!-- Add Customer Modal -->
+    <div id="addCustomerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus"></i> Add New Customer</h2>
+                <span class="close" onclick="closeAddCustomerModal()">&times;</span>
+            </div>
+            <form id="addCustomerForm" method="POST" class="modal-form">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="customers_name">Customer Name</label>
+                        <input type="text" name="customers_name" id="customers_name" placeholder="Customer Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" name="address" id="address" placeholder="Address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact</label>
+                        <input type="text" name="contact" id="contact" placeholder="Contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date_delivered">Date Delivered</label>
+                        <input type="date" name="date_delivered" id="date_delivered" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="item_name">Item Name</label>
+                        <input type="text" name="item_name" id="item_name" placeholder="e.g., Samsung, LG, Haier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="item_model">Item Model</label>
+                        <input type="text" name="item_model" id="item_model" placeholder="e.g., Refrigerator 36CX575" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="original_price">Original Price (Cash Price) (₱)</label>
+                        <input type="number" step="0.01" name="original_price" id="original_price" placeholder="Actual item price if paid in cash" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="downpayment">Downpayment (₱)</label>
+                        <input type="number" step="0.01" name="downpayment" id="downpayment" placeholder="Initial payment amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="term">Term (Months)</label>
+                        <input type="number" name="term" id="term" placeholder="1 for Good as Cash, 6, 12, 24, etc." min="1" max="60" required>
+                        <small style="color: #6b7280; font-size: 0.8rem;">Enter 1 for Good as Cash</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="monthly_due">Monthly Payment (₱)</label>
+                        <input type="number" step="0.01" name="monthly_due" id="monthly_due" placeholder="Monthly installment amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rebates">Rebates (₱)</label>
+                        <input type="number" step="0.01" name="rebates" id="rebates" placeholder="Rebates" required>
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" name="add_customer" class="btn btn-primary">Add Customer</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddCustomerModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+
+            function updateHamburger() {
+                if (!toggleBtn) return;
+                if (window.innerWidth <= 992) {
+                    toggleBtn.style.display = 'inline-flex';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+
+            updateHamburger();
+            window.addEventListener('resize', updateHamburger);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-open');
+                });
+            }
+
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+        })();
+    </script>
+
+    <script>
+        // Function to toggle item details display
+        function toggleItemDetails(button) {
+            const container = button.closest('.items-container');
+            const itemRows = container.querySelectorAll('.item-row');
+            const isExpanded = button.textContent.includes('Hide');
+            
+            if (isExpanded) {
+                // Show only first item
+                itemRows.forEach((row, index) => {
+                    if (index > 0) row.style.display = 'none';
+                });
+                button.innerHTML = '<i class="fas fa-eye"></i> Show Details';
+            } else {
+                // Show all items
+                itemRows.forEach(row => {
+                    row.style.display = 'block';
+                });
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
+            }
+        }
+
+        // Function to show edit item modal
+        function showEditItemModal(itemId) {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.id = 'editItemModalOverlay';
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal-container';
+            
+            fetch(`/modal/edit-item-content/${itemId}/`)
+                .then(response => response.text())
+                .then(html => {
+                    modalContainer.innerHTML = html;
+                    modalOverlay.appendChild(modalContainer);
+                    document.body.appendChild(modalOverlay);
+                    
+                    // Setup form handler after content is loaded
+                    setupEditItemFormHandler();
+                    
+                    // Add click outside to close
+                    modalOverlay.addEventListener('click', function(e) {
+                        if (e.target === modalOverlay) {
+                            closeEditItemModal();
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading edit item modal:', error);
+                    alert('Error loading the form. Please try again.');
+                });
+        }
+
+        function closeEditItemModal() {
+            const modalOverlay = document.getElementById('editItemModalOverlay');
+            if (modalOverlay) {
+                modalOverlay.remove();
+            }
+        }
+
+        function setupEditItemFormHandler() {
+            const form = document.getElementById('editItemForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success message
+                            showSuccessMessage(data.message);
+                            closeEditItemModal();
+                            // Refresh the page to show updated data
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating the item.');
+                    });
+                });
+            }
+        }
+
+        // Add Customer Modal Functions
+        document.getElementById('addCustomerBtn').addEventListener('click', function() {
+            document.getElementById('addCustomerModal').style.display = 'block';
+        });
+
+        // Add event listeners for remove customer buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-customer-btn')) {
+                const btn = e.target.closest('.remove-customer-btn');
+                const customerId = btn.getAttribute('data-customer-id');
+                const customerName = btn.getAttribute('data-customer-name');
+                showRemoveCustomerModal(customerId, customerName);
+            }
+        });
+
+        // Add event listeners for edit item buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.edit-item-btn')) {
+                const btn = e.target.closest('.edit-item-btn');
+                const itemId = btn.getAttribute('data-item-id');
+                showEditItemModal(itemId);
+            }
+        });
+
+        // Add Item Modal Functions - now using inline onclick handler
+
+        function showAddItemModal() {
+            document.getElementById('addItemModal').style.display = 'block';
+        }
+
+        function closeAddItemModal() {
+            document.getElementById('addItemModal').style.display = 'none';
+            document.getElementById('addItemForm').reset();
+        }
+
+        function setupAddItemFormHandler() {
+            const form = document.getElementById('addItemForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    
+                    fetch('{% url "add_item_modal_content" %}', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success message
+                            showSuccessMessage(data.message);
+                            closeAddItemModal();
+                            // Refresh the page to show updated data
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while adding the item.');
+                    });
+                });
+            }
+        }
+
+        function showAddCustomerModal() {
+            document.getElementById('addCustomerModal').style.display = 'block';
+        }
+
+        function closeAddCustomerModal() {
+            document.getElementById('addCustomerModal').style.display = 'none';
+            // Reset form
+            document.getElementById('addCustomerForm').reset();
+        }
+
+        // Handle add item form submission
+        document.getElementById('addItemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('{% url "add_item_modal_content" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeAddItemModal();
+                    showSuccessMessage(data.message);
+                    // Reload page to show new item
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showErrorMessage(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('An error occurred while adding the item.');
+            });
+        });
+
+        // Handle add customer form submission
+        document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('{% url "customers_list" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeAddCustomerModal();
+                    showSuccessMessage(data.message);
+                    // Reload page to show new customer
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showErrorMessage(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('An error occurred while adding the customer.');
+            });
+        });
+
+        function showSuccessMessage(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+                z-index: 10000;
+                font-weight: 600;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function showErrorMessage(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #ef4444, #dc2626);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+                z-index: 10000;
+                font-weight: 600;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            notification.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+
+    <!-- Profile Modal -->
+    {% if user.role == 'admin' %}
+    {% include 'modals/admin_profile_modal.html' %}
+    {% elif user.role == 'staff' %}
+    {% include 'modals/staff_profile_modal.html' %}
+    {% endif %}
+</body>
+</html>

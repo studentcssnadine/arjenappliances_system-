@@ -1,0 +1,634 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Due Payments - ARJEN APPLIANCES TRADING</title>
+    <link rel="icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --text: #333;
+            --text-light: #777;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile hamburger styles on dark navbar (desktop base) */
+        .navbar #sidebarToggle {
+            border: 1px solid rgba(255,255,255,0.45);
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+        }
+        .navbar #sidebarToggle i { color: #ffffff; }
+        .navbar #sidebarToggle:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover a,
+        .menu-item.active a {
+            background: #f8f9fa;
+            color: var(--primary);
+            border-left-color: var(--secondary);
+        }
+
+        .logout-item {
+            border-top: 1px solid #e0e0e0;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .logout-item a {
+            color: #dc3545 !important;
+        }
+
+        .logout-item:hover a {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border-left-color: #dc3545 !important;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card.danger {
+            border-left: 5px solid var(--accent);
+        }
+
+        .stat-card.warning {
+            border-left: 5px solid var(--warning);
+        }
+
+        .stat-card.success {
+            border-left: 5px solid var(--success);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .stat-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .filter-group select {
+            padding: 0.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Make table text black */
+        td {
+            color: #000000 !important;
+        }
+
+        td strong {
+            color: #000000 !important;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-due-soon {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-current {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-links a {
+            padding: 6px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .view-link {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .pay-link {
+            background: #28a745;
+            color: white;
+        }
+
+        .contact-link {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+
+            /* Off-canvas sidebar layout similar to admin dashboard */
+            .sidebar {
+                width: 260px;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                transform: translateX(-100%);
+                height: calc(100vh - 60px);
+                background: #ffffff;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+                transition: transform 0.3s ease;
+                z-index: 4000;
+                overflow-y: auto;
+            }
+
+            .navbar {
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .brand {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            /* Compact circular hamburger + profile icons */
+            .navbar #sidebarToggle {
+                margin-left: auto;
+                margin-right: 0.25rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+            }
+
+            .navbar #sidebarToggle i {
+                font-size: 1.1rem;
+            }
+
+            .navbar .user-menu {
+                order: 3;
+            }
+
+            .navbar .user-profile-dropdown .user-info-display {
+                padding: 0 !important;
+                width: 40px;
+                height: 40px;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+                justify-content: center;
+            }
+
+            .navbar .user-profile-dropdown .dropdown-arrow {
+                display: none;
+            }
+
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .filters { flex-wrap: wrap; }
+            .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .table-container table { min-width: 720px; }
+        }
+
+        /* Mobile sidebar overlay for due payments */
+        #mobileSidebarOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            z-index: 3500;
+        }
+
+        @media (max-width: 768px) {
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open #mobileSidebarOverlay { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo" style="height: 40px;">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <button id="sidebarToggle" class="btn btn-outline" aria-label="Toggle sidebar" style="display:none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <div id="mobileSidebarOverlay" aria-hidden="true"></div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar Menu -->
+        {% include 'includes/admin_sidebar.html' %}
+
+        <!-- Content Area -->
+        <main class="content">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-exclamation-circle"></i> Due Payments</h1>
+                <div>Track and manage overdue customer payments</div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>{{ stats.total_customers }}</h3>
+                    <p>Total Customers</p>
+                </div>
+                <div class="stat-card danger">
+                    <h3>{{ stats.overdue_customers }}</h3>
+                    <p>Overdue Customers</p>
+                </div>
+                <div class="stat-card warning">
+                    <h3>{{ stats.due_soon_customers }}</h3>
+                    <p>Due Soon (7 days)</p>
+                </div>
+                <div class="stat-card success">
+                    <h3>{{ stats.current_customers }}</h3>
+                    <p>Current Customers</p>
+                </div>
+                <div class="stat-card danger">
+                    <h3>₱{{ stats.total_overdue_amount|floatformat:2 }}</h3>
+                    <p>Total Overdue Amount</p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Filter by Status:</label>
+                    <select id="status-filter" onchange="applyFilters()">
+                        <option value="all" {% if filter_status == 'all' %}selected{% endif %}>All Customers</option>
+                        <option value="overdue" {% if filter_status == 'overdue' %}selected{% endif %}>Overdue Only</option>
+                        <option value="due_soon" {% if filter_status == 'due_soon' %}selected{% endif %}>Due Soon (7 days)</option>
+                        <option value="current" {% if filter_status == 'current' %}selected{% endif %}>Current Only</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-filter"></i> Apply Filter
+                </button>
+            </div>
+
+            <!-- Due Payments Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fas fa-list"></i> Payment Status Overview</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Contact</th>
+                            <th>Monthly Due</th>
+                            <th>Payments Made</th>
+                            <th>Expected</th>
+                            <th>Overdue</th>
+                            <th>Next Due Date</th>
+                            <th>Days Overdue</th>
+                            <th>Status</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if customers_data %}
+                            {% for data in customers_data %}
+                                <tr>
+                                    <td><strong>{{ data.customer.customers_name }}</strong></td>
+                                    <td>{{ data.customer.contact }}</td>
+                                    <td>₱{{ data.customer.monthly_due|floatformat:2 }}</td>
+                                    <td>{{ data.payments_made }}</td>
+                                    <td>{{ data.expected_payments }}</td>
+                                    <td>{{ data.overdue_payments }}</td>
+                                    <td>{{ data.next_due_date|date:"M d, Y" }}</td>
+                                    <td>{{ data.days_overdue }} days</td>
+                                    <td><span class="status-badge {{ data.status_class }}">{{ data.status_text }}</span></td>
+                                    <td>₱{{ data.balance|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="10" style="text-align: center; padding: 40px; color: #666;">
+                                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+                                    No customers found matching the selected criteria.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+
+            function updateHamburger() {
+                if (!toggleBtn) return;
+                if (window.innerWidth <= 992) {
+                    toggleBtn.style.display = 'inline-flex';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+
+            updateHamburger();
+            window.addEventListener('resize', updateHamburger);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-open');
+                });
+            }
+
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+        })();
+    </script>
+
+    <script>
+        function applyFilters() {
+            const status = document.getElementById('status-filter').value;
+            const url = new URL(window.location);
+            url.searchParams.set('status', status);
+            window.location = url;
+        }
+
+        // Add Item to Customer Modal Functions
+        function showAddItemModal() {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.id = 'addItemModalOverlay';
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal-container';
+            
+            fetch('{% url "add_item_modal_content" %}')
+                .then(response => response.text())
+                .then(html => {
+                    modalContainer.innerHTML = html;
+                    modalOverlay.appendChild(modalContainer);
+                    document.body.appendChild(modalOverlay);
+                    document.body.style.overflow = 'hidden';
+                })
+                .catch(error => {
+                    console.error('Error loading modal:', error);
+                    alert('Error loading the form. Please try again.');
+                });
+        }
+
+        function closeAddItemModal() {
+            const modalOverlay = document.getElementById('addItemModalOverlay');
+            if (modalOverlay) {
+                modalOverlay.remove();
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = '{% url "logout" %}';
+            }
+        }
+    </script>
+
+    <!-- Profile Modal -->
+    {% if user.role == 'admin' %}
+    {% include 'modals/admin_profile_modal.html' %}
+    {% elif user.role == 'staff' %}
+    {% include 'modals/staff_profile_modal.html' %}
+    {% endif %}
+</body>
+</html>

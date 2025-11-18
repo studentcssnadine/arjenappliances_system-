@@ -1,0 +1,146 @@
+<!-- Staff Payment Edit Request Modal -->
+<div class="modal-overlay" id="staffPaymentEditModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-shield"></i> Admin Approval Required</h3>
+            <button type="button" class="modal-close" onclick="closeStaffEditModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="approval-notice">
+                <div class="notice-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="notice-content">
+                    <h4>Staff Payment Edit Request</h4>
+                    <p>As a staff member, you need admin approval to edit payment records. Your edit request will be sent to the administrator for review.</p>
+                </div>
+            </div>
+            
+            <form id="staffEditRequestForm">
+                <div class="form-group">
+                    <label>Payment Details:</label>
+                    <div class="payment-info">
+                        <span id="editPaymentInfo">Payment information will be displayed here</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_reason">Reason for Edit Request:</label>
+                    <textarea id="edit_reason" rows="3" placeholder="Please explain why this payment record needs to be edited..." required></textarea>
+                </div>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeStaffEditModal()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-primary" onclick="submitEditRequest()">
+                <i class="fas fa-paper-plane"></i> Send Request to Admin
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.approval-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.notice-icon {
+    color: #856404;
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.notice-content h4 {
+    color: #856404;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.notice-content p {
+    color: #856404;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.payment-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+</style>
+
+<script>
+function showStaffEditRequest(paymentId, paymentInfo) {
+    document.getElementById('editPaymentInfo').textContent = paymentInfo;
+    document.getElementById('staffPaymentEditModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeStaffEditModal() {
+    document.getElementById('staffPaymentEditModal').classList.remove('show');
+    document.body.style.overflow = 'auto';
+    document.getElementById('staffEditRequestForm').reset();
+}
+
+function submitEditRequest() {
+    const reason = document.getElementById('edit_reason').value.trim();
+    
+    if (!reason) {
+        alert('Please provide a reason for the edit request.');
+        return;
+    }
+    
+    // Here you would normally send the request to the backend
+    alert('Edit request sent to administrator for approval. You will be notified once reviewed.');
+    closeStaffEditModal();
+}
+
+// Close modal when clicking outside
+document.getElementById('staffPaymentEditModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeStaffEditModal();
+    }
+});
+</script>

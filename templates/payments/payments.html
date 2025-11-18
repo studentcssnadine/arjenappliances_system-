@@ -1,0 +1,974 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Management - ARJEN APPLIANCES TRADING</title>
+    <link rel="icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --text: #333;
+            --text-light: #777;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile hamburger styles on dark navbar (desktop base) */
+        .navbar #sidebarToggle {
+            border: 1px solid rgba(255,255,255,0.45);
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+        }
+        .navbar #sidebarToggle i { color: #ffffff; }
+        .navbar #sidebarToggle:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover a,
+        .menu-item.active a {
+            background: #f8f9fa;
+            color: var(--primary);
+            border-left-color: var(--secondary);
+        }
+
+        .logout-item {
+            border-top: 1px solid #e0e0e0;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .logout-item a {
+            color: #dc3545 !important;
+        }
+
+        .logout-item:hover a {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border-left-color: #dc3545 !important;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tab Navigation */
+        .tab-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tab-btn:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            padding: 2rem;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Payment Summary Cards */
+        .payment-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .summary-card.primary {
+            border-left: 5px solid var(--primary);
+        }
+
+        .summary-card.success {
+            border-left: 5px solid var(--success);
+        }
+
+        .summary-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .summary-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Payment History Table */
+        .payments-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Make table text black */
+        td {
+            color: #000000 !important;
+        }
+
+        td strong {
+            color: #000000 !important;
+        }
+
+        /* Record Payment Form */
+        .payment-form {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .brand-text { font-size: 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+
+            /* Off-canvas sidebar layout similar to admin dashboard */
+            .sidebar {
+                width: 260px;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                transform: translateX(-100%);
+                height: calc(100vh - 60px);
+                background: #ffffff;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+                transition: transform 0.3s ease;
+                z-index: 4000;
+                overflow-y: auto;
+            }
+
+            .navbar {
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .brand {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            /* Compact circular hamburger + profile icons */
+            .navbar #sidebarToggle {
+                margin-left: auto;
+                margin-right: 0.25rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+            }
+
+            .navbar #sidebarToggle i {
+                font-size: 1.1rem;
+            }
+
+            .navbar .user-menu {
+                order: 3;
+            }
+
+            .navbar .user-profile-dropdown .user-info-display {
+                padding: 0 !important;
+                width: 40px;
+                height: 40px;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+                justify-content: center;
+            }
+
+            .navbar .user-profile-dropdown .dropdown-arrow {
+                display: none;
+            }
+
+            .page-title { font-size: 1.4rem; }
+            .payment-summary { grid-template-columns: 1fr 1fr; }
+            .payments-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { min-width: 720px; }
+            th, td { padding: 0.75rem; }
+        }
+
+        /* Mobile sidebar overlay for payments */
+        #mobileSidebarOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            z-index: 3500;
+        }
+
+        @media (max-width: 768px) {
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open #mobileSidebarOverlay { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo" style="height: 40px;">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <button id="sidebarToggle" class="btn btn-outline" aria-label="Toggle sidebar" style="display:none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <div id="mobileSidebarOverlay" aria-hidden="true"></div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar Menu -->
+        {% if user.role == 'admin' %}
+            {% include 'includes/admin_sidebar.html' %}
+        {% else %}
+            {% include 'includes/staff_admin_sidebar.html' %}
+        {% endif %}
+
+        <!-- Content Area -->
+        <main class="content">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-credit-card"></i> Payment Management</h1>
+                <div>Track and manage customer payments</div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="showTab('history')">
+                        <i class="fas fa-list"></i> Payment History
+                    </button>
+                    <button class="tab-btn" onclick="showTab('records')">
+                        <i class="fas fa-plus-circle"></i> Record New Payment
+                    </button>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                            <i class="fas {% if message.tags == 'error' %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Payment History Tab -->
+                <div id="history" class="tab-content active">
+                    <!-- Payment Summary -->
+                    <div class="payment-summary">
+                        <div class="summary-card primary">
+                            <h3>{{ total_payments_count }}</h3>
+                            <p>Total Payments</p>
+                            <small>₱{{ total_payments_amount|floatformat:2 }}</small>
+                        </div>
+                        <div class="summary-card success">
+                            <h3>{{ today_payments_count }}</h3>
+                            <p>Today's Payments</p>
+                            <small>₱{{ today_payments_amount|floatformat:2 }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Payment History Table -->
+                    <div class="payments-table">
+                        <div class="table-header">
+                            <h3><i class="fas fa-list"></i> Recent Payment History</h3>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction #</th>
+                                    <th>Customer</th>
+                                    <th>Item Name</th>
+                                    <th>Date / Time</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Rebate</th>
+                                    <th>Recorded By</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_payments %}
+                                    {% for payment in recent_payments %}
+                                    <tr>
+                                        <td><strong>{{ payment.transaction_number|default:"TXN-PENDING" }}</strong></td>
+                                        <td><strong>{{ payment.customer.customers_name }}</strong></td>
+                                        <td>
+                                            {% if payment.customer_item %}
+                                                <strong>{{ payment.customer_item.item_name }}</strong><br>
+                                                <small style="color: #6c757d;">{{ payment.customer_item.item_model }}</small>
+                                            {% else %}
+                                                <span style="color: #6c757d;">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td title="{{ payment.created_at|date:'M j, Y, h:i:s A' }}">
+                                            {{ payment.payment_date|date:"M j, Y" }}<br>
+                                            <span style="color: #6c757d; font-size: 0.85rem;">{{ payment.created_at|date:"h:i:s A" }}</span>
+                                        </td>
+                                        <td><strong>₱{{ payment.amount_paid|floatformat:2 }}</strong></td>
+                                        <td>{{ payment.payment_method }}</td>
+                                        <td>
+                                            {% if payment.has_rebate and payment.rebate_amount %}
+                                                <span style="color: #28a745; font-weight: 600;">₱{{ payment.rebate_amount|floatformat:2 }}</span>
+                                            {% else %}
+                                                <span style="color: #6c757d;">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ payment.recorded_by.full_name|default:payment.recorded_by.username|default:"System" }}</td>
+                                        <td>{{ payment.notes|default:"—" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="9" style="text-align: center; padding: 3rem; color: #666;">
+                                            <i class="fas fa-receipt" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+                                            No payment records found
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Record Payment Tab -->
+                <div id="records" class="tab-content">
+                    <div class="payment-form">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">
+                            <i class="fas fa-plus-circle"></i> Record New Payment
+                        </h3>
+
+                        <form method="POST" action="{% url 'record_payment' %}">
+                            {% csrf_token %}
+                            
+                            <div class="form-group">
+                                <label for="customer_id">Customer <span style="color: var(--accent);">*</span></label>
+                                <select name="customer_id" id="customer_id" required onchange="loadCustomerItemsPayments()">
+                                    <option value="">Select a customer...</option>
+                                    {% for customer in customers %}
+                                        <option value="{{ customer.id }}">{{ customer.customers_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="customer_item_id">Item Name <span style="color: var(--accent);">*</span></label>
+                                <select name="customer_item_id" id="customer_item_id" required>
+                                    <option value="">Select customer first...</option>
+                                </select>
+                                <small style="color: #666; font-size: 0.9rem; margin-top: 0.25rem; display: block;">
+                                    <i class="fas fa-info-circle"></i> Choose which item this payment is for
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="transaction_number">Transaction #</label>
+                                <input type="text" name="transaction_number" id="transaction_number" readonly style="background-color: #f8f9fa; color: #666;" placeholder="Auto-generated on save">
+                                <small style="color: #666; font-size: 0.9rem; margin-top: 0.25rem; display: block;">
+                                    <i class="fas fa-info-circle"></i> Transaction number will be automatically generated when payment is recorded
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="recorded_time_display">Recorded Time</label>
+                                <input type="text" id="recorded_time_display" readonly style="background-color: #f8f9fa; color: #666;">
+                                <small style="color: #666; font-size: 0.9rem; margin-top: 0.25rem; display: block;">
+                                    <i class="fas fa-clock"></i> Actual recorded time is saved by the system automatically.
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="payment_date">Payment Date <span style="color: var(--accent);">*</span></label>
+                                <input type="date" name="payment_date" id="payment_date" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount_paid">Amount Paid <span style="color: var(--accent);">*</span></label>
+                                <input type="number" name="amount_paid" id="amount_paid" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="payment_method">Payment Method</label>
+                                <select name="payment_method" id="payment_method">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Check">Check</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="GCash">GCash</option>
+                                    <option value="PayMaya">PayMaya</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="rebate_applied">Rebate Applied</label>
+                                <select name="rebate_applied" id="rebate_applied" onchange="toggleRebateAmount()">
+                                    <option value="No">No</option>
+                                    <option value="Yes">Yes</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="rebate_amount_group" style="display: none;">
+                                <label for="rebate_amount">Rebate Amount (₱)</label>
+                                <input type="number" name="rebate_amount" id="rebate_amount" step="0.01" min="0" placeholder="0.00">
+                                <small style="color: #6c757d; font-size: 0.8rem;">Enter the rebate amount to be applied to this payment</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="notes">Notes <span style="color: var(--accent);">*</span></label>
+                                <textarea name="notes" id="notes" rows="3" placeholder="Please describe this payment (required)" required></textarea>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 2rem;">
+                                <button type="submit" name="add_payment" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Record Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+
+            function updateHamburger() {
+                if (!toggleBtn) return;
+                if (window.innerWidth <= 992) {
+                    toggleBtn.style.display = 'inline-flex';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+
+            updateHamburger();
+            window.addEventListener('resize', updateHamburger);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-open');
+                });
+            }
+
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+        })();
+    </script>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('payment_date').value = new Date().toISOString().split('T')[0];
+
+        // Show current time in the form (display only; backend saves server time)
+        const rt = document.getElementById('recorded_time_display');
+        if (rt) {
+            const updateTime = () => {
+                const now = new Date();
+                rt.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            };
+            updateTime();
+            // keep ticking each second while form is open
+            setInterval(updateTime, 1000);
+        }
+
+        // Toggle rebate amount field visibility
+        function toggleRebateAmount() {
+            const rebateApplied = document.getElementById('rebate_applied').value;
+            const rebateAmountGroup = document.getElementById('rebate_amount_group');
+            const rebateAmountInput = document.getElementById('rebate_amount');
+            
+            if (rebateApplied === 'Yes') {
+                rebateAmountGroup.style.display = 'block';
+                rebateAmountInput.required = true;
+            } else {
+                rebateAmountGroup.style.display = 'none';
+                rebateAmountInput.required = false;
+                rebateAmountInput.value = '';
+            }
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab button
+            event.target.classList.add('active');
+        }
+
+        // Add Item to Customer Modal Functions
+        function showAddItemModal() {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.id = 'addItemModalOverlay';
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal-container';
+            
+            fetch('{% url "add_item_modal_content" %}')
+                .then(response => response.text())
+                .then(html => {
+                    modalContainer.innerHTML = html;
+                    modalOverlay.appendChild(modalContainer);
+                    document.body.appendChild(modalOverlay);
+                    document.body.style.overflow = 'hidden';
+                    
+                    setupAddItemFormHandler();
+                })
+                .catch(error => {
+                    console.error('Error loading modal:', error);
+                    alert('Error loading the form. Please try again.');
+                });
+        }
+
+        function closeAddItemModal() {
+            const modalOverlay = document.getElementById('addItemModalOverlay');
+            if (modalOverlay) {
+                modalOverlay.remove();
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function setupAddItemFormHandler() {
+            const form = document.getElementById('addItemForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    
+                    // Show loading state
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Item...';
+                    submitBtn.disabled = true;
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success alert
+                            alert('Success: ' + data.message);
+                            
+                            // Close modal
+                            closeAddItemModal();
+                            
+                            // Reload page to show updated data
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            // Show error message
+                            alert('Error: ' + data.message);
+                            
+                            // Reset button
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error submitting form. Please try again.');
+                        
+                        // Reset button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
+        }
+
+        function setupAddItemFormHandler() {
+            const form = document.getElementById('addItemForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    
+                    fetch('{% url "add_item_modal_content" %}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Success: ' + data.message);
+                            closeAddItemModal();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error submitting form. Please try again.');
+                    });
+                });
+            }
+        }
+
+        function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = '{% url "logout" %}';
+            }
+        }
+
+        // Load customer items for payment form
+        function loadCustomerItemsPayments() {
+            console.log('Loading customer items...');
+            const customerId = document.getElementById('customer_id').value;
+            const itemSelect = document.getElementById('customer_item_id');
+            
+            if (!customerId) {
+                itemSelect.innerHTML = '<option value="">Select customer first...</option>';
+                return;
+            }
+            
+            // Show loading state
+            itemSelect.innerHTML = '<option value="">Loading items...</option>';
+            itemSelect.disabled = true;
+            
+            // Fetch customer items via AJAX
+            fetch(`/api/customer-items/${customerId}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API Response:', data);
+                    
+                    // Reset select
+                    itemSelect.innerHTML = '<option value="">Select an item...</option>';
+                    itemSelect.disabled = false;
+                    
+                    if (data.success && data.items && data.items.length > 0) {
+                        data.items.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id;
+                            option.textContent = `${item.item_name} - ${item.item_model}`;
+                            itemSelect.appendChild(option);
+                        });
+                        console.log(`✅ Successfully loaded ${data.items.length} items`);
+                    } else {
+                        itemSelect.innerHTML = '<option value="">No items found for this customer</option>';
+                        console.log('No items found for customer');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading items:', error);
+                    itemSelect.innerHTML = '<option value="">Error loading items - please try again</option>';
+                    itemSelect.disabled = false;
+                });
+        }
+    </script>
+
+    <!-- Profile Modal -->
+    {% if user.role == 'admin' %}
+    {% include 'modals/admin_profile_modal.html' %}
+    {% elif user.role == 'staff' %}
+    {% include 'modals/staff_profile_modal.html' %}
+    {% endif %}
+</body>
+</html>

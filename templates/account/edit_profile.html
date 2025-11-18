@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex align-items-center" style="background: var(--primary); color: #fff;">
+          <i class="fas fa-user-edit me-2"></i>
+          <strong>Edit Profile</strong>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label" for="id_username">Username</label>
+              {{ form.username }}
+              {% if form.username.errors %}
+                <div class="text-danger small">{{ form.username.errors|striptags }}</div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_full_name">Full name</label>
+              {{ form.full_name }}
+              {% if form.full_name.errors %}
+                <div class="text-danger small">{{ form.full_name.errors|striptags }}</div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_email">Email</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <div class="text-danger small">{{ form.email.errors|striptags }}</div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_phone">Phone</label>
+              {{ form.phone }}
+              {% if form.phone.errors %}
+                <div class="text-danger small">{{ form.phone.errors|striptags }}</div>
+              {% endif %}
+            </div>
+            <div class="d-flex justify-content-between">
+              <a class="btn btn-outline-secondary" href="{% if user.role == 'admin' %}{% url 'admin_dashboard' %}{% elif user.role == 'staff' %}{% url 'staff_dashboard' %}{% else %}{% url 'customer_dashboard' %}{% endif %}">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

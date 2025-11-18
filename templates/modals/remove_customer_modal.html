@@ -1,0 +1,416 @@
+<!-- Remove Customer Modal -->
+<div class="modal-overlay" id="removeCustomerModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Remove Customer</h3>
+            <button type="button" class="modal-close" onclick="closeRemoveCustomerModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="removeCustomerForm" method="POST" action="">
+            {% csrf_token %}
+            <input type="hidden" name="remove_customer" value="1">
+            <input type="hidden" name="customer_id" id="removeCustomerId">
+            
+            <div class="modal-body">
+                <div class="customer-info">
+                    <h4>Customer: <span id="removeCustomerName"></span></h4>
+                    <p>Please select how you want to remove this customer:</p>
+                </div>
+                
+                <div class="removal-options">
+                    <label class="removal-option">
+                        <input type="radio" name="removal_type" value="pullout" required checked>
+                        <div class="option-card pullout-option">
+                            <div class="option-icon">
+                                <i class="fas fa-archive"></i>
+                            </div>
+                            <div class="option-content">
+                                <h4>Pull Out (Archive)</h4>
+                                <p>Move customer to archive. Customer data and payment history will be preserved but marked as inactive. This is <strong>reversible</strong>.</p>
+                            </div>
+                        </div>
+                    </label>
+                    
+                    <label class="removal-option">
+                        <input type="radio" name="removal_type" value="permanent" required>
+                        <div class="option-card delete-option">
+                            <div class="option-icon">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>
+                            <div class="option-content">
+                                <h4>Delete Permanently</h4>
+                                <p><strong>⚠️ Warning:</strong> This will completely remove the customer and all payment records. This action <strong>cannot be undone!</strong></p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="form-group" id="transactionNumberGroup" style="display: none;">
+                    <label for="transaction_number">Transaction Number</label>
+                    <input type="text" name="transaction_number" id="transaction_number" class="form-control" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                    <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                        <i class="fas fa-info-circle"></i> Auto-generated transaction number for this pullout operation
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="removal_reason">Reason for Removal</label>
+                    <textarea name="removal_reason" id="removal_reason" rows="3" placeholder="Please provide a reason for removing this customer..." required></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeRemoveCustomerModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-danger" id="confirmRemovalBtn">
+                    <i class="fas fa-check"></i> Confirm Removal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .modal-container {
+    transform: scale(1);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.customer-info {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.customer-info h4 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.removal-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.removal-option {
+    cursor: pointer;
+}
+
+.removal-option input[type="radio"] {
+    display: none;
+}
+
+.option-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.option-card:hover {
+    border-color: #3498db;
+    background: #f8f9fa;
+}
+
+.removal-option input[type="radio"]:checked + .option-card {
+    border-color: #3498db;
+    background: #e3f2fd;
+}
+
+.pullout-option.option-card:hover,
+.removal-option input[type="radio"]:checked + .pullout-option {
+    border-color: #f39c12;
+    background: #fff8e1;
+}
+
+.delete-option.option-card:hover,
+.removal-option input[type="radio"]:checked + .delete-option {
+    border-color: #e74c3c;
+    background: #ffebee;
+}
+
+.option-icon {
+    font-size: 2rem;
+    width: 60px;
+    text-align: center;
+}
+
+.pullout-option .option-icon {
+    color: #f39c12;
+}
+
+.delete-option .option-icon {
+    color: #e74c3c;
+}
+
+.option-content h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+}
+
+.option-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group textarea,
+.form-group .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group textarea:focus,
+.form-group .form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+@media (max-width: 768px) {
+    .modal-container {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .removal-options {
+        gap: 0.75rem;
+    }
+    
+    .option-card {
+        padding: 1rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+function showRemoveCustomerModal(customerId, customerName) {
+    document.getElementById('removeCustomerId').value = customerId;
+    document.getElementById('removeCustomerName').textContent = customerName;
+    
+    // Set the form action URL
+    const form = document.getElementById('removeCustomerForm');
+    form.action = `/customers/${customerId}/remove/`;
+    
+    // Generate transaction number
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const customerIdPadded = String(customerId).padStart(4, '0');
+    const transactionNumber = `PULLOUT-${year}${month}${day}-${customerIdPadded}`;
+    
+    // Show transaction number field by default (since pullout is default)
+    document.getElementById('transactionNumberGroup').style.display = 'block';
+    document.getElementById('transaction_number').value = transactionNumber;
+    
+    document.getElementById('removeCustomerModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRemoveCustomerModal() {
+    document.getElementById('removeCustomerModal').classList.remove('show');
+    document.body.style.overflow = 'auto';
+    
+    // Reset form and hide transaction number field
+    document.getElementById('removeCustomerForm').reset();
+    document.getElementById('transactionNumberGroup').style.display = 'none';
+    document.getElementById('transaction_number').required = false;
+}
+
+// Handle removal type change
+document.addEventListener('change', function(e) {
+    if (e.target.name === 'removal_type') {
+        const transactionGroup = document.getElementById('transactionNumberGroup');
+        const transactionInput = document.getElementById('transaction_number');
+        
+        if (e.target.value === 'pullout') {
+            // Generate new transaction number for pullout
+            const customerId = document.getElementById('removeCustomerId').value;
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const customerIdPadded = String(customerId).padStart(4, '0');
+            const transactionNumber = `PULLOUT-${year}${month}${day}-${customerIdPadded}`;
+            
+            transactionGroup.style.display = 'block';
+            transactionInput.value = transactionNumber;
+        } else {
+            transactionGroup.style.display = 'none';
+            transactionInput.value = '';
+        }
+    }
+});
+
+document.getElementById('removeCustomerForm').addEventListener('submit', function(e) {
+    const selectedType = document.querySelector('input[name="removal_type"]:checked');
+    
+    if (!selectedType) {
+        e.preventDefault();
+        alert('Please select a removal type.');
+        return;
+    }
+    
+    if (selectedType.value === 'permanent') {
+        if (!confirm('Are you ABSOLUTELY sure you want to permanently delete this customer? This will remove all payment records and cannot be undone!')) {
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('confirmRemovalBtn');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    submitBtn.disabled = true;
+});
+
+// Close modal when clicking outside
+document.getElementById('removeCustomerModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRemoveCustomerModal();
+    }
+});
+</script>

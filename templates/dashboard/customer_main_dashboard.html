@@ -1,0 +1,1029 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - Arjen Appliances Trading</title>
+    <link rel="icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar - aligned with admin/staff */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile hamburger styles on dark navbar */
+        .navbar #sidebarToggle {
+            border: 1px solid rgba(255,255,255,0.45);
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+        }
+        .navbar #sidebarToggle i { color: #ffffff; }
+        .navbar #sidebarToggle:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        /* User profile dropdown uses shared include styles */
+        /* Intentionally no overrides here to keep consistency with admin */
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand img.logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        /* Removed customer-only navbar overrides that conflicted with shared dropdown */
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* .profile-btn unused */
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: var(--shadow);
+            padding: 2rem 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 0.5rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--light);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .welcome-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+
+
+        /* Current Month Bill */
+        .current-bill {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .bill-header {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .bill-header.overdue {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+        }
+
+        .bill-header.partial {
+            background: linear-gradient(135deg, var(--warning), #d68910);
+        }
+
+        .bill-header.unpaid {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+        }
+
+        .bill-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bill-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .bill-status {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .bill-content {
+            padding: 2rem;
+        }
+
+        /* Items Grid */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .item-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 2.5rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-left: 6px solid var(--primary);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .item-info h4 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .item-info p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-monthly {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-details {
+            margin-top: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-row span:first-child {
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .detail-row span:last-child {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        /* Transaction Info */
+        .transaction-info {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .transaction-title {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .transaction-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .transaction-row.highlight {
+            font-weight: 600;
+            border-top: 1px solid #bbdefb;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+
+        /* Partial Payment Alert */
+        .partial-payment {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .partial-payment h4 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+
+        .payment-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ffeaa7;
+        }
+
+        .payment-entry:last-child {
+            border-bottom: none;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        /* Overdue Alert */
+        .overdue-alert {
+            background: #fff5f5;
+            border: 2px solid #fecaca;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .overdue-alert h4 {
+            color: var(--danger);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .overdue-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--danger);
+        }
+        
+        .overdue-amount {
+            font-weight: 600;
+            color: var(--danger);
+        }
+        
+        .overdue-days {
+            font-size: 0.85rem;
+            color: #666;
+            background: #fecaca;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        .overdue-total {
+            background: var(--danger);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Paid Message */
+        .paid-message {
+            text-align: center;
+            background: #f0fff4;
+            border: 2px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 2rem;
+            color: var(--success);
+        }
+        
+        .paid-message i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .paid-message h3 {
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+        
+        .paid-message p {
+            color: #166534;
+            font-size: 1rem;
+        }
+
+        /* Account Setup Required */
+        .account-setup {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 3rem;
+            text-align: center;
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .account-setup h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .account-setup p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+
+            /* Navbar: keep brand on left, icons on right in one row */
+            .navbar {
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .brand {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            .navbar #sidebarToggle {
+                order: 2;
+                margin-left: auto;
+                margin-right: 0.25rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+            }
+
+            .navbar #sidebarToggle i {
+                font-size: 1.1rem;
+            }
+
+            .navbar .user-menu {
+                order: 3;
+            }
+
+            /* Compact circular profile button on mobile */
+            .navbar .user-profile-dropdown .user-info-display {
+                padding: 0 !important;
+                width: 40px;
+                height: 40px;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+                justify-content: center;
+            }
+
+            .navbar .user-profile-dropdown .dropdown-arrow {
+                display: none;
+            }
+
+            .content {
+                padding: 1rem 0.75rem;
+            }
+
+            .welcome-section,
+            .current-bill {
+                margin: 1rem 0;
+                border-radius: 10px;
+            }
+
+            .bill-content {
+                padding: 1.25rem;
+            }
+
+            .bill-amount {
+                font-size: 1.8rem;
+            }
+            
+            .items-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .item-card {
+                padding: 1.5rem;
+            }
+
+            .item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .breakdown-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .breakdown-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .payment-entry {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .overdue-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Mobile sidebar overlay */
+        #mobileSidebarOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            z-index: 3500;
+        }
+
+        /* Off-canvas sidebar for tablets/phones */
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .brand-text { font-size: 1rem; }
+            .main-container { flex-direction: column; }
+            .content { padding: 1rem; }
+
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                transform: translateX(-100%);
+                width: 260px;
+                height: calc(100vh - 60px);
+                background: #ffffff;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+                transition: transform 0.3s ease;
+                z-index: 4000;
+                overflow-y: auto;
+            }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open #mobileSidebarOverlay { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+     <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo" class="logo">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <button id="sidebarToggle" class="btn btn-outline" aria-label="Toggle sidebar" style="display:none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <div id="mobileSidebarOverlay" aria-hidden="true"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_transactions' %}" class="nav-link">
+                        <i class="fas fa-credit-card"></i>
+                        <span>All Transactions</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_items' %}" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>My Items</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            {% if not customer %}
+            <!-- Account Setup Required -->
+            <div class="account-setup">
+                <h2>Account Setup Required</h2>
+                <p>Your customer account needs to be linked to a customer record.</p>
+                <p>Please contact the administrator to complete your account setup.</p>
+                <a href="{% url 'logout' %}" style="color: #3b82f6;">Logout</a>
+            </div>
+            {% else %}
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Welcome back, {{ customer.customers_name|default:user.full_name|default:user.username }}!</h1>
+                <p class="welcome-subtitle">Here's your payment status for {% now "F Y" %}</p>
+            </div>
+
+
+            <!-- Current Month Bill -->
+            <div class="current-bill">
+                <div class="bill-header{% if is_overdue and monthly_billing.amount_paid == 0 %} overdue{% elif is_overdue and monthly_billing.amount_paid > 0 %} partial{% elif monthly_billing.status == 'partial' %} partial{% elif monthly_billing.status != 'paid' %} unpaid{% endif %}">
+                    <h2 class="bill-title">{% now "F Y" %} Payment Due</h2>
+                    <div class="bill-amount">
+                        ₱{{ monthly_billing.total_due|floatformat:2 }}
+                    </div>
+                    <div class="bill-status" style="margin-bottom: 0.25rem;">
+                        {% if is_overdue and monthly_billing.amount_paid == 0 %}
+                            You have not paid for this month and your payment is overdue.
+                        {% elif is_overdue and monthly_billing.amount_paid > 0 %}
+                            You have made a payment, but there are still overdue months to settle.
+                        {% elif monthly_billing.status == 'paid' %}
+                            This month is fully paid.
+                        {% elif monthly_billing.status == 'partial' %}
+                            You have paid part of this month. Please pay the remaining balance.
+                        {% else %}
+                            Your payment for this month is not yet due.
+                        {% endif %}
+                    </div>
+                    <div class="bill-status" style="font-size: 0.9rem; opacity: 0.9;">
+                        {% with customer_items_count=customer_items|length %}
+                            This amount covers <strong>{{ customer_items_count }}</strong> active item{{ customer_items_count|pluralize }} you purchased.
+                        {% endwith %}
+                    </div>
+                </div>
+
+                <div class="bill-content">
+                    <!-- Customer Items -->
+                    {% if customer_items %}
+                    <div class="items-grid">
+                        {% for item in customer_items %}
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-info">
+                                    <h4>{{ item.item_name|default:customer.item }}</h4>
+                                    <p>{{ item.item_model|default:"Standard Model" }}</p>
+                                    <p style="color: #059669; font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
+                                        <i class="fas fa-info-circle"></i> What you purchased on installment
+                                    </p>
+                                </div>
+                                <div class="item-monthly">₱{{ item.monthly_due|default:customer.monthly_due|floatformat:0 }}/month</div>
+                            </div>
+                            <div class="item-details">
+                                <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #0ea5e9;">
+                                    <p style="color: #0c4a6e; font-size: 0.9rem; margin: 0; font-weight: 500;">
+                                        <i class="fas fa-lightbulb"></i> <strong>Why installment?</strong> You chose to pay in installments to make this purchase more affordable while enjoying your item immediately.
+                                    </p>
+                                </div>
+                                <div style="border-top: 2px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem; background: #fafafa; padding: 1rem; border-radius: 8px;">
+                                    <div class="detail-row" style="margin-bottom: 0.5rem;">
+                                        <span><strong>Gross Price:</strong></span>
+                                        <span><strong>₱{{ item.calculated_gross_price|default:16166|floatformat:0 }}</strong></span>
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #6b7280; font-style: italic; margin-top: 0.5rem;">
+                                        <i class="fas fa-calculator"></i> Computation: ₱{{ item.monthly_due|default:customer.monthly_due|floatformat:0 }}/month × {% if item.term_months %}{{ item.term_months }}{% else %}{{ customer.term }}{% endif %} months + ₱{% if item.downpayment %}{{ item.downpayment|floatformat:0 }}{% else %}{{ customer.downpayment|default:0|floatformat:0 }}{% endif %} downpayment = ₱{{ item.calculated_gross_price|default:16166|floatformat:0 }}
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #4b5563; margin-top: 0.25rem;">
+                                        Gross Price is the total amount you will pay for this item: all monthly installments plus your downpayment.
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Original Cash Price:</span>
+                                    <span>₱{% if item.original_price %}{{ item.original_price|floatformat:2 }}{% else %}{{ contract_details.total_contract|floatformat:2 }}{% endif %}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Downpayment Paid:</span>
+                                    <span>₱{% if item.downpayment %}{{ item.downpayment|floatformat:2 }}{% else %}{{ customer.downpayment|default:0|floatformat:2 }}{% endif %}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Payment Term:</span>
+                                    <span>{% if item.term_months %}{% if item.term_months == 1 %}Good as Cash{% else %}{{ item.term_months }} months{% endif %}{% else %}{% if customer.term == 1 %}Good as Cash{% else %}{{ customer.term }} months{% endif %}{% endif %}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Payments Made:</span>
+                                    <span>{{ item.payments_made }} of {% if item.term_months %}{{ item.term_months }}{% else %}{{ customer.term }}{% endif %}</span>
+                                </div>
+                                <div class="detail-row" style="color: #059669;">
+                                    <span>Amount You've Paid:</span>
+                                    <span>
+                                        {% if item.total_paid and item.total_paid > 0 %}
+                                        <span style="background-color: #22c55e; color: #000000; padding: 0.25rem 0.9rem; border-radius: 999px; font-weight: 600; display: inline-block; min-width: 90px; text-align: center;">
+                                        {% else %}
+                                        <span style="background-color: #ef4444; color: #000000; padding: 0.25rem 0.9rem; border-radius: 999px; font-weight: 600; display: inline-block; min-width: 90px; text-align: center;">
+                                        {% endif %}
+                                            ₱{{ item.total_paid|default:0|floatformat:2 }}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="detail-row" style="color: {% if item.remaining_balance > 0 %}#dc2626{% else %}#059669{% endif %};">
+                                    <span>{% if item.remaining_balance > 0 %}Overall Remaining Balance:{% else %}Fully Paid!{% endif %}</span>
+                                    <span>
+                                        <span style="background-color: #facc15; color: #000000; padding: 0.25rem 0.9rem; border-radius: 999px; font-weight: 600; display: inline-block; min-width: 90px; text-align: center;">
+                                            ₱{{ item.remaining_balance|default:0|floatformat:0 }}
+                                        </span>
+                                    </span>
+                                </div>
+                                {% if monthly_billing.remaining_balance > 0 %}
+                                <div class="detail-row" style="color: #b45309;">
+                                    <span>Remaining Balance for this month:</span>
+                                    <span>
+                                        <span style="background-color: #fb923c; color: #000000; padding: 0.25rem 0.9rem; border-radius: 999px; font-weight: 600; display: inline-block; min-width: 90px; text-align: center;">
+                                            ₱{{ monthly_billing.remaining_balance|floatformat:0 }}
+                                        </span>
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Fallback for single item from customer table -->
+                    <div class="items-grid">
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-info">
+                                    <h4>{{ customer.item|default:"No Item Listed" }}</h4>
+                                    <p>Standard Model</p>
+                                </div>
+                                <div class="item-monthly">₱{{ customer.monthly_due|floatformat:0 }}/month</div>
+                            </div>
+                            <div class="item-details">
+                                <div style="border-top: 2px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem; background: #fafafa; padding: 1rem; border-radius: 8px;">
+                                    <div class="detail-row" style="margin-bottom: 0.5rem;">
+                                        <span><strong>Gross Price:</strong></span>
+                                        <span><strong>₱16,166</strong></span>
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #6b7280; font-style: italic; margin-top: 0.5rem;">
+                                        <i class="fas fa-calculator"></i> Computation: ₱{{ customer.monthly_due|floatformat:0 }}/month × {{ customer.term }} months + ₱{{ customer.downpayment|default:0|floatformat:0 }} downpayment = ₱16,166
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #4b5563; margin-top: 0.25rem;">
+                                        Gross Price is the total amount you will pay for this item: all monthly installments plus your downpayment.
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Original Cash Price:</span>
+                                    <span>₱{{ contract_details.total_contract|floatformat:2 }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Downpayment:</span>
+                                    <span>₱{{ customer.downpayment|default:0|floatformat:2 }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Term:</span>
+                                    <span>{% if customer.term == 1 %}Good as Cash{% else %}{{ customer.term }} months{% endif %}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Payments Made:</span>
+                                    <span>{{ contract_details.payments_made }} of {{ customer.term }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Overall Remaining Balance:</span>
+                                    <span>
+                                        <span style="background-color: #facc15; color: #000000; padding: 0.25rem 0.9rem; border-radius: 999px; font-weight: 600; display: inline-block; min-width: 90px; text-align: center;">
+                                            ₱{{ contract_details.balance|floatformat:2 }}
+                                        </span>
+                                    </span>
+                                </div>
+                                {% if monthly_billing.remaining_balance > 0 %}
+                                <div class="detail-row" style="color: #b45309;">
+                                    <span>Remaining Balance for this month:</span>
+                                    <span>
+                                        <span style="background-color: #fb923c; color: #000000; padding: 0.25rem 0.9rem; border-radius: 999px; font-weight: 600; display: inline-block; min-width: 90px; text-align: center;">
+                                            ₱{{ monthly_billing.remaining_balance|floatformat:0 }}
+                                        </span>
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+
+                    <!-- Partial Payment Alert -->
+                    {% if monthly_billing.status == 'partial' and this_month_payments %}
+                    <div class="partial-payment">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Partial Payment Received</h4>
+                        {% for payment in this_month_payments %}
+                        <div class="payment-entry">
+                            <span>{{ payment.payment_date|date:"M d, Y" }} - {{ payment.payment_method|default:"Cash"|title }} Payment</span>
+                            <span>₱{{ payment.amount_paid|floatformat:2 }}</span>
+                        </div>
+                        {% endfor %}
+                        <p style="margin-top: 1rem;"><strong>Remaining Balance for this month:</strong> ₱{{ monthly_billing.remaining_balance|floatformat:0 }} (Due: {{ monthly_billing.due_date|date:"M d, Y" }})</p>
+                        <p style="color: #856404; font-size: 0.9rem; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> 
+                            You can pay the remaining balance anytime before the end of this month.
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    
+                    
+                    <!-- Recent Payment History -->
+                    <div style="background: #ffffff; border-radius: 12px; box-shadow: var(--shadow); margin: 2rem 0; overflow: hidden;">
+                        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-list"></i> Payment History
+                            </h3>
+                            <a href="{% url 'customer_transactions' %}" style="font-size: 0.85rem; color: #2563eb; text-decoration: none;">
+                                View all
+                            </a>
+                        </div>
+                        {% if recent_payments %}
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                <thead>
+                                    <tr style="background-color: #f9fafb;">
+                                        <th style="padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Transaction #</th>
+                                        <th style="padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Date Paid / Time</th>
+                                        <th style="padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Item</th>
+                                        <th style="padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Amount</th>
+                                        <th style="padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Method</th>
+                                        <th style="padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in recent_payments %}
+                                    <tr style="border-bottom: 1px solid #f3f4f6;">
+                                        <td style="padding: 0.75rem 1rem; font-weight: 600;">{{ payment.transaction_number|default:"TXN-PENDING" }}</td>
+                                        <td style="padding: 0.75rem 1rem;">
+                                            <div>{{ payment.payment_date|date:"M d, Y" }}</div>
+                                            {% if payment.created_at %}
+                                                <div style="font-size: 0.8rem; color: #6b7280;">{{ payment.created_at|date:"h:i:s A" }}</div>
+                                            {% endif %}
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem;">
+                                            {% if payment.customer_item %}
+                                                <div style="font-weight: 600; color: #2563eb;">{{ payment.customer_item.item_name }}</div>
+                                                <div style="font-size: 0.8rem; color: #6b7280;">{{ payment.customer_item.item_model|default:"Standard Model" }}</div>
+                                            {% else %}
+                                                <span style="color: #9ca3af;">General Payment</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem; font-weight: 600; color: #16a34a;">₱{{ payment.amount_paid|floatformat:2 }}</td>
+                                        <td style="padding: 0.75rem 1rem;">{{ payment.payment_method|default:"Cash" }}</td>
+                                        <td style="padding: 0.75rem 1rem;">{{ payment.notes|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div style="padding: 1.5rem; text-align: center; color: #6b7280;">
+                            <i class="fas fa-receipt" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                            No payments have been recorded yet.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="{% url 'customer_transactions' %}" class="btn btn-outline">
+                            <i class="fas fa-list"></i>
+                            View All Transactions
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <script>
+
+        // Pay All Items (Good as Cash) functionality
+        function payAllItemsGoodAsCash() {
+            // Use pre-calculated total cash price from backend
+            const totalCashPrice = parseFloat('{{ contract_details.total_cash_price|default:0 }}');
+            
+            const message = `Pay All Items (Good as Cash)\n\nTotal Cash Price: ₱${totalCashPrice.toFixed(2)}\n\nThis will settle all your items immediately with the cash discount applied.\n\nWould you like to proceed with this payment option?`;
+            
+            if (confirm(message)) {
+                // Redirect to payment processing or show payment form
+                alert('Good as Cash payment functionality will be implemented. Total: ₱' + totalCashPrice.toFixed(2));
+                // TODO: Implement actual payment processing
+                // window.location.href = '/customer/pay-good-as-cash/';
+            }
+        }
+        
+        console.log('Enhanced Customer Dashboard Loaded');
+
+        (function() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            function updateHamburger() {
+                if (!toggleBtn) return;
+                if (window.innerWidth <= 992) {
+                    toggleBtn.style.display = 'inline-flex';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+            updateHamburger();
+            window.addEventListener('resize', updateHamburger);
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-open');
+                });
+            }
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

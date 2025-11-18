@@ -1,0 +1,384 @@
+<!-- User Profile Dropdown Component -->
+<div class="user-profile-dropdown">
+    <div class="user-info-display" onclick="toggleProfileDropdown()">
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-details">
+            <span class="user-name">{{ user.full_name|default:user.username }}</span>
+            <span class="user-role">{{ user.role|upper }}</span>
+        </div>
+        <i class="fas fa-chevron-down dropdown-arrow"></i>
+    </div>
+    
+    <div class="profile-dropdown-menu" id="profileDropdownMenu">
+        <div class="dropdown-header">
+            <div class="user-avatar-large">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="user-info">
+                <h4>{{ user.full_name|default:user.username }}</h4>
+            </div>
+        </div>
+        
+        <div class="dropdown-divider"></div>
+        
+        <div class="dropdown-items">
+            <a href="#" class="dropdown-item" onclick="openProfileEditModal(event)">
+                <i class="fas fa-user-edit"></i>
+                <span>Edit Profile</span>
+            </a>
+            
+            <div class="dropdown-divider"></div>
+            
+            <a href="{% url 'logout' %}" class="dropdown-item logout-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.user-profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.user-info-display {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-info-display:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.user-avatar i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.user-name {
+    font-weight: 600;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    margin-top: 0.1rem;
+}
+
+
+.dropdown-arrow {
+    color: white;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.user-info-display.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.profile-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    min-width: 280px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    z-index: 6000;
+}
+
+.profile-dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary), #34495e);
+    color: white;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar-large i {
+    font-size: 3rem;
+    color: white;
+}
+
+.user-info h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.user-info p {
+    margin: 0.2rem 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.user-info small {
+    opacity: 0.7;
+    font-size: 0.8rem;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 0.5rem 0;
+}
+
+.dropdown-items {
+    padding: 0.5rem 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: #f8f9fa;
+    color: var(--primary);
+}
+
+.dropdown-item.logout-item {
+    color: #dc3545;
+}
+
+.dropdown-item.logout-item:hover {
+    background: #fff5f5;
+    color: #dc3545;
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .user-details { display: none; }
+    /* Keep dropdown within viewport on small screens */
+    .profile-dropdown-menu {
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        left: auto;
+        width: 88vw;
+        min-width: 0;
+        max-height: 75vh;
+        overflow-y: auto;
+        transform: translateY(0);
+        z-index: 6000;
+    }
+}
+/* Modal overlay for Edit Profile */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.25);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 5000;
+    /* Let the page behind continue to scroll */
+    pointer-events: none;
+}
+.modal-overlay.show { display: flex; }
+.modal-card {
+    background: #ffffff;
+    width: 95%;
+    max-width: 720px;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    /* Re-enable interactions on the modal content */
+    pointer-events: all;
+}
+.modal-header {
+    padding: 0.9rem 1.25rem;
+    background: linear-gradient(135deg, var(--primary), #34495e);
+    color: #fff;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.modal-title { font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+.modal-close {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+.modal-body { padding: 1rem 1.25rem; overflow-y: auto; }
+.modal-footer { padding: 0.9rem 1.25rem; display: flex; gap: 0.75rem; justify-content: flex-end; }
+.modal-footer .btn { min-width: 120px; }
+</style>
+
+<!-- Edit Profile Modal (blurred background, scrollable content) -->
+<div id="editProfileOverlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="editProfileTitle">
+        <div class="modal-header">
+            <div class="modal-title" id="editProfileTitle">
+                <i class="fas fa-user-edit"></i>
+                Edit Profile
+            </div>
+            <button type="button" class="modal-close" onclick="closeProfileEditModal()" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form method="post" action="{% url 'edit_profile' %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <style>
+                /* Staff-style compact form controls inside modal */
+                #editProfileOverlay .form-group { margin-bottom: 0.75rem; }
+                #editProfileOverlay .form-label { font-weight: 600; font-size: 0.92rem; margin-bottom: 0.25rem; color: #374151; }
+                #editProfileOverlay .form-control {
+                    width: 100%;
+                    border: 1px solid #dee2e6;
+                    border-radius: 4px;
+                    padding: 0.6rem 0.75rem;
+                    font-size: 0.95rem;
+                    background: #fff;
+                    color: #111827;
+                }
+                #editProfileOverlay .form-control:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+                #editProfileOverlay .btn-cancel { background: #f8f9fa; border: 1px solid #d1d5db; color: #374151; }
+                #editProfileOverlay .btn-cancel:hover { background: #edeff2; }
+                #editProfileOverlay .btn-save { background: #1e3a8a; color: #fff; }
+                #editProfileOverlay .btn-save:hover { background: #1e40af; }
+                </style>
+
+                <div class="form-group">
+                    <label class="form-label" for="modal_username">Username</label>
+                    <input type="text" class="form-control" id="modal_username" name="username" value="{{ user.username }}" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="modal_full_name">Full name</label>
+                    <input type="text" class="form-control" id="modal_full_name" name="full_name" value="{{ user.full_name }}" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="modal_email">Email</label>
+                    <input type="email" class="form-control" id="modal_email" name="email" value="{{ user.email }}" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="modal_phone">Phone</label>
+                    <input type="text" class="form-control" id="modal_phone" name="phone" value="{{ user.phone }}" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="closeProfileEditModal()">Cancel</button>
+                <button type="submit" class="btn btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+    
+</div>
+
+<script>
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdownMenu');
+    const trigger = document.querySelector('.user-info-display');
+    
+    dropdown.classList.toggle('show');
+    trigger.classList.toggle('active');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('profileDropdownMenu');
+    const trigger = document.querySelector('.user-info-display');
+    
+    if (!event.target.closest('.user-profile-dropdown')) {
+        dropdown.classList.remove('show');
+        trigger.classList.remove('active');
+    }
+});
+
+function openProfileEditModal(e) {
+    if (e) e.preventDefault();
+    const modal = document.getElementById('editProfileOverlay');
+    if (modal) {
+        modal.classList.add('show');
+        // Populate fields with server data (with customer fallback for phone)
+        try {
+            fetch('{% url "get_profile_data" %}', { credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(data => {
+                    if (!data || !data.success) return;
+                    const p = data.profile || {};
+                    const u = (id) => document.getElementById(id);
+                    if (u('modal_username')) u('modal_username').value = p.username || '';
+                    if (u('modal_full_name')) u('modal_full_name').value = p.full_name || '';
+                    if (u('modal_email')) u('modal_email').value = p.email || '';
+                    if (u('modal_phone')) u('modal_phone').value = p.phone || '';
+                })
+                .catch(() => {});
+        } catch (_) {}
+    }
+}
+
+function closeProfileEditModal() {
+    const modal = document.getElementById('editProfileOverlay');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// Close on ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('editProfileOverlay');
+        if (modal && modal.classList.contains('show')) {
+            e.preventDefault();
+            modal.classList.remove('show');
+        }
+    }
+});
+</script>

@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Customer - ArjenSystem{% endblock %}
+
+{% block extra_css %}
+<style>
+  @media (max-width: 992px) {
+    .container { padding: 0 1rem; }
+  }
+
+  @media (max-width: 768px) {
+    /* Stack two/three column inline grids used in this form */
+    form > div[style*="grid-template-columns"] {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block sidebar %}
+    {% if user.role == 'admin' %}
+        {% include 'includes/admin_sidebar.html' %}
+    {% elif user.role == 'staff' %}
+        {% include 'includes/staff_admin_sidebar.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 0 auto;">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fas fa-user-plus"></i> Add New Customer
+            </h1>
+            <p style="margin-top: 0.5rem; color: #666;">Create a new customer record with contract details</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Customer Information Section -->
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-user"></i> Customer Information
+                </h2>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="form-group">
+                    <label for="{{ form.customers_name.id_for_label }}" class="form-label">
+                        <i class="fas fa-user"></i> Customer Name *
+                    </label>
+                    {{ form.customers_name }}
+                    {% if form.customers_name.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.customers_name.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.contact.id_for_label }}" class="form-label">
+                        <i class="fas fa-phone"></i> Contact Number *
+                    </label>
+                    {{ form.contact }}
+                    {% if form.contact.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.contact.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.address.id_for_label }}" class="form-label">
+                    <i class="fas fa-map-marker-alt"></i> Address *
+                </label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                    <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                        {{ form.address.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Contract Details Section -->
+            <div class="card-header" style="margin-top: 2rem;">
+                <h2 class="card-title">
+                    <i class="fas fa-file-contract"></i> Contract Details
+                </h2>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="form-group">
+                    <label for="{{ form.item.id_for_label }}" class="form-label">
+                        <i class="fas fa-shopping-cart"></i> Item/Product *
+                    </label>
+                    {{ form.item }}
+                    {% if form.item.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.item.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.date_delivered.id_for_label }}" class="form-label">
+                        <i class="fas fa-calendar"></i> Delivery Date *
+                    </label>
+                    {{ form.date_delivered }}
+                    {% if form.date_delivered.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.date_delivered.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Payment Terms Section -->
+            <div class="card-header" style="margin-top: 2rem;">
+                <h2 class="card-title">
+                    <i class="fas fa-money-bill-wave"></i> Payment Terms
+                </h2>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="form-group">
+                    <label for="{{ form.amount.id_for_label }}" class="form-label">
+                        <i class="fas fa-calculator"></i> Total Contract Amount *
+                    </label>
+                    {{ form.amount }}
+                    {% if form.amount.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.amount.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.monthly.id_for_label }}" class="form-label">
+                        <i class="fas fa-calendar-alt"></i> Monthly Payment *
+                    </label>
+                    {{ form.monthly }}
+                    {% if form.monthly.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.monthly.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.term.id_for_label }}" class="form-label">
+                        <i class="fas fa-clock"></i> Term (Months) *
+                    </label>
+                    {{ form.term }}
+                    {% if form.term.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.term.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="form-group">
+                    <label for="{{ form.downpayment.id_for_label }}" class="form-label">
+                        <i class="fas fa-hand-holding-usd"></i> Down Payment
+                    </label>
+                    {{ form.downpayment }}
+                    {% if form.downpayment.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.downpayment.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.rebates.id_for_label }}" class="form-label">
+                        <i class="fas fa-percentage"></i> Rebates/Discounts
+                    </label>
+                    {{ form.rebates }}
+                    {% if form.rebates.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.rebates.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.monthly_due.id_for_label }}" class="form-label">
+                        <i class="fas fa-exclamation-circle"></i> Monthly Due Amount
+                    </label>
+                    {{ form.monthly_due }}
+                    {% if form.monthly_due.errors %}
+                        <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                            {{ form.monthly_due.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <small style="color: #666; font-size: 0.8rem;">Usually same as monthly payment</small>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 2rem; border-top: 1px solid #e1e5e9;">
+                <a href="{% url 'customers_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Save Customer
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Calculation Helper -->
+    <div class="card" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-calculator"></i> Payment Calculator
+            </h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; color: #3498db; margin-bottom: 0.5rem;">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h4 style="color: #1e3a8a;">Auto Calculate</h4>
+                <p style="font-size: 0.9rem; color: #666;">
+                    Enter total amount and term to auto-calculate monthly payment
+                </p>
+            </div>
+            
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; color: #2ecc71; margin-bottom: 0.5rem;">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h4 style="color: #1e3a8a;">Payment Schedule</h4>
+                <p style="font-size: 0.9rem; color: #666;">
+                    Payments start one month after delivery date
+                </p>
+            </div>
+            
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; color: #f39c12; margin-bottom: 0.5rem;">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <h4 style="color: #1e3a8a;">Rebates</h4>
+                <p style="font-size: 0.9rem; color: #666;">
+                    Discounts reduce the total contract amount
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountField = document.getElementById('id_amount');
+    const termField = document.getElementById('id_term');
+    const monthlyField = document.getElementById('id_monthly');
+    const monthlyDueField = document.getElementById('id_monthly_due');
+    
+    function calculateMonthly() {
+        const amount = parseFloat(amountField.value) || 0;
+        const term = parseInt(termField.value) || 1;
+        
+        if (amount > 0 && term > 0) {
+            const monthly = (amount / term).toFixed(2);
+            if (!monthlyField.value) {
+                monthlyField.value = monthly;
+            }
+            if (!monthlyDueField.value) {
+                monthlyDueField.value = monthly;
+            }
+        }
+    }
+    
+    // Auto-calculate when amount or term changes
+    amountField.addEventListener('input', calculateMonthly);
+    termField.addEventListener('input', calculateMonthly);
+    
+    // Sync monthly and monthly_due fields
+    monthlyField.addEventListener('input', function() {
+        if (!monthlyDueField.value) {
+            monthlyDueField.value = this.value;
+        }
+    });
+    
+    // Set today's date as default for delivery date
+    const dateField = document.getElementById('id_date_delivered');
+    if (!dateField.value) {
+        const today = new Date().toISOString().split('T')[0];
+        dateField.value = today;
+    }
+});
+</script>
+{% endblock %}

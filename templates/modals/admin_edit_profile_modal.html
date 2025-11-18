@@ -1,0 +1,126 @@
+<!-- Admin Edit Profile Modal -->
+<div class="modal-overlay" id="adminEditModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-cog"></i> Edit Admin Profile</h3>
+            <button type="button" class="modal-close" onclick="closeAdminEditModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="adminEditForm" method="POST" action="{% url 'admin_edit_profile' %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit_username">Username <span class="required">*</span></label>
+                    <input type="text" id="edit_username" name="username" value="{{ user.username }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_full_name">Full Name</label>
+                    <input type="text" id="edit_full_name" name="full_name" value="{{ user.full_name|default:'' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_email">Email</label>
+                    <input type="email" id="edit_email" name="email" value="{{ user.email|default:'' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="current_password">Current Password <span class="required">*</span></label>
+                    <input type="password" id="current_password" name="current_password" required>
+                    <small>Required to confirm changes</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new_password">New Password (leave blank to keep current)</label>
+                    <input type="password" id="new_password" name="new_password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAdminEditModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.required {
+    color: #e74c3c;
+}
+</style>
+
+<script>
+function openEditAdminModal() {
+    document.getElementById('adminEditModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAdminEditModal() {
+    document.getElementById('adminEditModal').classList.remove('show');
+    document.body.style.overflow = 'auto';
+    document.getElementById('adminEditForm').reset();
+}
+
+// Validate password confirmation
+document.getElementById('adminEditForm').addEventListener('submit', function(e) {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (newPassword && newPassword !== confirmPassword) {
+        e.preventDefault();
+        alert('New password and confirmation do not match.');
+        return false;
+    }
+});
+
+// Close modal when clicking outside
+document.getElementById('adminEditModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAdminEditModal();
+    }
+});
+</script>

@@ -1,0 +1,1224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Customer - ArjenSystem</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand img {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            font-weight: 500;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            margin: 0;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover a,
+        .menu-item.active a {
+            background: #f8f9fa;
+            color: var(--primary);
+            border-left-color: var(--secondary);
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-item {
+            border-top: 1px solid #e0e0e0;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .logout-item a {
+            color: #dc3545 !important;
+        }
+
+        .logout-item:hover a {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border-left-color: #dc3545 !important;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            background: #f4f6f9;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-dark {
+            background: #495057;
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background: #343a40;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .gross-price-display {
+            background: #f3f4f6;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .gross-price-value {
+            font-weight: 600;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+
+        .gross-formula {
+            display: block;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        /* Customer Items Styling */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            margin: 0;
+        }
+
+        .item-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .item-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .item-header h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-icon.edit-item {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .btn-icon.edit-item:hover {
+            background: #1976d2;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-icon.delete-item {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .btn-icon.delete-item:hover {
+            background: #d32f2f;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .item-details {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .detail-row .label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .detail-row .value {
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .detail-row .value.total {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .detail-row .value.rebate {
+            color: #e67e22;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .items-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .item-card {
+                padding: 1rem;
+            }
+            
+            .item-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .item-actions {
+                justify-content: flex-end;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .close:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding: 2rem;
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            align-items: center;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+        }
+
+        /* Additional responsive design for items grid */
+        @media (max-width: 1200px) {
+            .items-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .items-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .item-card {
+                padding: 1rem;
+            }
+            
+            .item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .item-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar Menu -->
+        <aside class="sidebar">
+            <ul class="menu-items">
+                <li class="menu-item">
+                    <a href="{% url 'admin_dashboard' %}">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="{% url 'customers_list' %}">
+                        <i class="fas fa-users"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{% url 'payments' %}">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Payments</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{% url 'due_payments_report' %}">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Due Payments</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{% url 'customer_history' %}">
+                        <i class="fas fa-history"></i>
+                        <span>Customer History</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{% url 'reports' %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                {% if user.role == 'admin' %}
+                <li class="menu-item">
+                    <a href="{% url 'manage_users' %}">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Manage Users</span>
+                    </a>
+                </li>
+                {% endif %}
+                <li class="menu-item logout-item">
+                    <a href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-user-edit"></i> Edit Customer</h1>
+                <div>Update customer information</div>
+            </div>
+
+            <div class="form-section">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ customer.id }}">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="customers_name">Customer Name</label>
+                            <input type="text" id="customers_name" name="customers_name" value="{{ customer.customers_name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" id="address" name="address" value="{{ customer.address }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact">Contact</label>
+                            <input type="text" id="contact" name="contact" value="{{ customer.contact }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date_delivered">Date Delivered</label>
+                            <input type="date" id="date_delivered" name="date_delivered" value="{{ customer.date_delivered|date:'Y-m-d' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item_name">Item Name</label>
+                            <input type="text" id="item_name" name="item_name" 
+                                   value="{{ customer.item_name }}" 
+                                   placeholder="e.g., Samsung, LG, Haier" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item_model">Item Model</label>
+                            <input type="text" id="item_model" name="item_model" 
+                                   value="{{ customer.item_model }}" 
+                                   placeholder="e.g., Refrigerator 36CX575" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="original_price">Original Price (Cash Price) (₱)</label>
+                            <input type="number" step="0.01" id="original_price" name="original_price" 
+                                   value="{{ customer.contract_value }}" 
+                                   placeholder="Actual item price if paid in cash" required onchange="calculateGross()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="downpayment">Downpayment (₱)</label>
+                            <input type="number" step="0.01" id="downpayment" name="downpayment" 
+                                   value="{{ customer.downpayment }}" 
+                                   placeholder="Initial payment amount" required onchange="calculateGross()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="term">Term (Months)</label>
+                            <input type="number" id="term" name="term" value="{{ customer.term }}" 
+                                   min="1" max="60" placeholder="1 for Good as Cash, 6, 12, 24, etc." required onchange="calculateGross()">
+                            <small style="color: #6b7280; font-size: 0.8rem;">Enter 1 for Good as Cash</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly_due">Monthly Payment (₱)</label>
+                            <input type="number" step="0.01" id="monthly_due" name="monthly_due" 
+                                   value="{{ customer.monthly_due }}" 
+                                   placeholder="Monthly installment amount" required onchange="calculateGross()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gross Price (Total Installment Cost)</label>
+                            <div class="gross-price-display">
+                                <span id="grossPrice" class="gross-price-value">
+                                    {{ customer.total_contract_display|default:"₱0.00" }}
+                                </span>
+                                <small id="grossFormula" class="gross-formula">
+                                    {% if customer.term == 1 %}
+                                        Good as Cash: Downpayment now + Balance next month
+                                    {% else %}
+                                        Formula: (Term × Monthly Payment) + Downpayment
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rebates">Rebates (₱)</label>
+                            <input type="number" step="0.01" id="rebates" name="rebates" value="{{ customer.rebates }}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" name="update" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Customer
+                        </button>
+                        <a href="{% url 'customers_list' %}" class="btn btn-dark">
+                            <i class="fas fa-arrow-left"></i> Back to Customers
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Customer Items Section -->
+            {% if customer_items %}
+            <div class="form-section" style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="color: var(--primary); margin: 0;">
+                            <i class="fas fa-boxes"></i> Customer Items ({{ customer_items|length }}/3)
+                        </h2>
+                        <small style="color: #6c757d; font-size: 0.9rem;">
+                            {% if customer_items|length >= 3 %}
+                                <i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i> Maximum limit reached (3 items per customer)
+                            {% else %}
+                                <i class="fas fa-info-circle"></i> Maximum 3 items allowed per customer
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+
+                <div class="items-grid">
+                    {% for item in customer_items %}
+                    <div class="item-card" data-item-id="{{ item.id }}">
+                        <div class="item-header">
+                            <h3>{{ item.item_name }} {{ item.item_model }}</h3>
+                            <div class="item-actions">
+                                <button type="button" class="btn-icon edit-item" onclick="editItem({{ item.id }})" title="Edit Item">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn-icon delete-item" onclick="deleteItem({{ item.id }})" title="Delete Item">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="label">Original Price:</span>
+                                <span class="value">₱{{ item.original_price|floatformat:2 }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Downpayment:</span>
+                                <span class="value">₱{{ item.downpayment|floatformat:2 }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Monthly Due:</span>
+                                <span class="value">₱{{ item.monthly_due|floatformat:2 }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Term:</span>
+                                <span class="value">{{ item.term_months }} months</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Rebates:</span>
+                                <span class="value">₱{{ item.rebate_amount|floatformat:2|default:"0.00" }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Total Contract:</span>
+                                <span class="value total">₱{{ item.total_contract_amount|floatformat:2 }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Purchase Date:</span>
+                                <span class="value">{{ item.purchase_date|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="form-section" style="margin-top: 2rem;">
+                <div style="text-align: center; padding: 2rem; color: #6c757d;">
+                    <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h3>No Items Found</h3>
+                    <p>This customer doesn't have any items in the new system yet.</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        <i class="fas fa-info-circle"></i> Maximum 3 items allowed per customer
+                    </p>
+                    <button type="button" class="btn btn-primary" onclick="openAddItemModal()">
+                        <i class="fas fa-plus"></i> Add First Item
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <script>
+        function calculateGross() {
+            const monthlyDue = parseFloat(document.getElementById('monthly_due').value) || 0;
+            const termMonths = parseInt(document.getElementById('term').value) || 0;
+            const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+            
+            if (monthlyDue > 0 && termMonths > 0) {
+                const grossPrice = (monthlyDue * termMonths) + downpayment;
+                document.getElementById('grossPrice').textContent = '₱' + grossPrice.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                // Show special message for Good as Cash
+                const formula = document.getElementById('grossFormula');
+                if (termMonths === 1) {
+                    formula.textContent = 'Good as Cash: Downpayment now + Balance next month';
+                    formula.style.color = '#059669';
+                    formula.style.fontWeight = '600';
+                } else {
+                    formula.textContent = 'Formula: (Term × Monthly Payment) + Downpayment';
+                    formula.style.color = '#6b7280';
+                    formula.style.fontWeight = 'normal';
+                }
+            }
+        }
+
+        function openAddItemModal() {
+            alert('Add Item functionality - Coming soon!');
+        }
+
+        function editItem(itemId) {
+            alert('Edit button clicked! Item ID: ' + itemId);
+            console.log('editItem function called with ID:', itemId);
+            
+            // Find the item data from the page
+            const itemCard = document.querySelector(`[data-item-id="${itemId}"]`);
+            console.log('Found item card:', itemCard);
+            
+            if (!itemCard) {
+                alert('Item not found! Item ID: ' + itemId);
+                return;
+            }
+            
+            console.log('Item card HTML:', itemCard.innerHTML);
+            
+            // Extract current item data from the display
+            const itemName = itemCard.querySelector('h3').textContent.split(' ').slice(0, -1).join(' ');
+            const itemModel = itemCard.querySelector('h3').textContent.split(' ').pop();
+            
+            // Get values from the item display
+            const detailRows = itemCard.querySelectorAll('.detail-row');
+            const originalPriceText = detailRows[0].querySelector('.value').textContent;
+            const downpaymentText = detailRows[1].querySelector('.value').textContent;
+            const monthlyDueText = detailRows[2].querySelector('.value').textContent;
+            const termText = detailRows[3].querySelector('.value').textContent;
+            
+            // Clean and parse the values
+            const originalPrice = parseFloat(originalPriceText.replace(/[₱,]/g, ''));
+            const downpayment = parseFloat(downpaymentText.replace(/[₱,]/g, ''));
+            const monthlyDue = parseFloat(monthlyDueText.replace(/[₱,]/g, ''));
+            const termMonths = parseInt(termText.replace(/[^0-9]/g, ''));
+            
+            // Get additional values from the item display
+            const goodAsCashText = detailRows[4] ? detailRows[4].querySelector('.value').textContent : '';
+            const rebateText = detailRows[5] ? detailRows[5].querySelector('.value').textContent : '₱0.00';
+            const purchaseDateText = detailRows[7] ? detailRows[7].querySelector('.value').textContent : '';
+            
+            // Parse additional values
+            const rebateAmount = parseFloat(rebateText.replace(/[₱,]/g, '')) || 0;
+            
+            // Convert purchase date format (from "Nov 01, 2025" to "2025-11-01")
+            let purchaseDate = '';
+            if (purchaseDateText) {
+                const date = new Date(purchaseDateText);
+                if (!isNaN(date.getTime())) {
+                    purchaseDate = date.toISOString().split('T')[0];
+                }
+            }
+            
+            // Populate the edit form
+            document.getElementById('edit_item_id').value = itemId;
+            document.getElementById('edit_item_name').value = itemName;
+            document.getElementById('edit_item_model').value = itemModel;
+            document.getElementById('edit_original_price').value = originalPrice;
+            document.getElementById('edit_downpayment').value = downpayment;
+            document.getElementById('edit_monthly_due').value = monthlyDue;
+            document.getElementById('edit_term_months').value = termMonths;
+            document.getElementById('edit_rebate_amount').value = rebateAmount;
+            document.getElementById('edit_purchase_date').value = purchaseDate;
+            
+            // Set good_as_cash based on whether monthly_due is 0 or not
+            const goodAsCash = monthlyDue === 0 ? 'yes' : 'no';
+            document.getElementById('edit_good_as_cash').value = goodAsCash;
+            
+            // Show the modal
+            document.getElementById('editItemModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeEditItemModal() {
+            document.getElementById('editItemModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('editItemForm').reset();
+        }
+
+        function deleteItem(itemId) {
+            // Get item details for the specific item being removed
+            const itemCard = document.querySelector(`[data-item-id="${itemId}"]`);
+            const itemName = itemCard.querySelector('.item-header h3').textContent.trim();
+            
+            // Show confirmation dialog for individual item removal
+            if (confirm(`Are you sure you want to remove this item: "${itemName}"?\n\nThis will create a pullout record for this specific item only.`)) {
+                // Create form data for individual item removal
+                const formData = new FormData();
+                formData.append('action', 'remove_item');
+                formData.append('item_id', itemId);
+                formData.append('customer_id', '{{ customer.id }}');
+                formData.append('customer_name', '{{ customer.customers_name }}');
+                formData.append('item_name', itemName);
+                formData.append('removal_reason', 'Individual item pullout');
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                
+                // Generate transaction number for this item pullout
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const itemIdPadded = String(itemId).padStart(4, '0');
+                const transactionNumber = `ITEM-PULLOUT-${year}${month}${day}-${itemIdPadded}`;
+                formData.append('transaction_number', transactionNumber);
+                
+                // Submit the individual item removal
+                fetch('{% url "edit_customer" customer.id %}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the item card from the page with animation
+                        itemCard.style.animation = 'fadeOut 0.3s ease-out';
+                        setTimeout(() => {
+                            itemCard.remove();
+                            
+                            // Update the item count in the header
+                            const remainingItems = document.querySelectorAll('.item-card').length - 1;
+                            const headerTitle = document.querySelector('h2');
+                            if (headerTitle) {
+                                headerTitle.innerHTML = `<i class="fas fa-boxes"></i> Customer Items (${remainingItems}/3)`;
+                            }
+                            
+                            // Show success message
+                            alert(`Item "${itemName}" has been successfully removed and added to Customer History.`);
+                            
+                            // If no items left, reload the page
+                            if (remainingItems === 0) {
+                                location.reload();
+                            }
+                        }, 300);
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to remove item'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while removing the item.');
+                });
+            }
+        }
+
+        // Handle edit item form submission
+        document.getElementById('editItemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('{% url "edit_customer" customer.id %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeEditItemModal();
+                    showSuccessMessage('✅ Item updated successfully!');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating item. Please try again.');
+            });
+        });
+
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+                z-index: 10000;
+                font-weight: 600;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            
+            const cleanMessage = message.replace(/✅/g, '✓');
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${cleanMessage}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateGross();
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.9); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <!-- Edit Item Modal -->
+    <div id="editItemModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Item</h2>
+                <span class="close" onclick="closeEditItemModal()">&times;</span>
+            </div>
+            <form id="editItemForm" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_item">
+                <input type="hidden" name="item_id" id="edit_item_id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit_item_name">Item Name</label>
+                        <input type="text" id="edit_item_name" name="item_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_item_model">Item Model</label>
+                        <input type="text" id="edit_item_model" name="item_model" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_original_price">Original Price (₱)</label>
+                        <input type="number" id="edit_original_price" name="original_price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_downpayment">Downpayment (₱)</label>
+                        <input type="number" id="edit_downpayment" name="downpayment" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_monthly_due">Monthly Due (₱)</label>
+                        <input type="number" id="edit_monthly_due" name="monthly_due" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_term_months">Term (Months)</label>
+                        <input type="number" id="edit_term_months" name="term_months" min="1" max="60" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_good_as_cash">Good as Cash</label>
+                        <select id="edit_good_as_cash" name="good_as_cash" required>
+                            <option value="">Select Option</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_rebate_amount">Rebate Amount (₱)</label>
+                        <input type="number" id="edit_rebate_amount" name="rebate_amount" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_purchase_date">Purchase Date</label>
+                        <input type="date" id="edit_purchase_date" name="purchase_date" required>
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Item
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditItemModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Remove Customer Modal -->
+    {% include 'modals/remove_customer_modal.html' %}
+
+    <!-- Staff Profile Modal -->
+    {% if user.role == 'staff' %}
+    {% include 'modals/staff_profile_modal.html' %}
+    {% endif %}
+
+</body>
+</html>

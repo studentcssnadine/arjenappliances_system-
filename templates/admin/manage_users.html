@@ -1,0 +1,943 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - ARJEN APPLIANCES TRADING</title>
+    <link rel="icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --text: #333;
+            --text-light: #777;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile hamburger styles on dark navbar (desktop base) */
+        .navbar #sidebarToggle {
+            border: 1px solid rgba(255,255,255,0.45);
+            color: #ffffff;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+        }
+        .navbar #sidebarToggle i { color: #ffffff; }
+        .navbar #sidebarToggle:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover a,
+        .menu-item.active a {
+            background: #f8f9fa;
+            color: var(--primary);
+            border-left-color: var(--secondary);
+        }
+
+        .logout-item {
+            border-top: 1px solid #e0e0e0;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .logout-item a {
+            color: #dc3545 !important;
+        }
+
+        .logout-item:hover a {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border-left-color: #dc3545 !important;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .coming-soon {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 4rem;
+            text-align: center;
+        }
+
+        .coming-soon i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        .coming-soon h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Form Sections */
+        .form-section, .table-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-title {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification-badge {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Pending Registrations */
+        .pending-registrations {
+            padding: 1.5rem;
+        }
+
+        .registration-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .user-info-card {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .user-avatar-large {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .user-details h4 {
+            margin: 0 0 0.25rem 0;
+            color: var(--primary);
+        }
+
+        .username {
+            color: #666;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .user-meta, .contact-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .role-customer { background: #3498db; }
+        .role-admin { background: #e74c3c; }
+        .role-staff { background: #f39c12; }
+
+        .customer-link {
+            background: #2ecc71;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .contact-info span {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .registration-time {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .action-buttons-card {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success { background: #2ecc71; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+
+        .btn:hover { opacity: 0.9; }
+
+        /* No Pending */
+        .no-pending {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .no-pending i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-admin { background: #e74c3c; color: white; }
+        .badge-staff { background: #f39c12; color: white; }
+        .badge-customer { background: #3498db; color: white; }
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-inactive { background: #f8d7da; color: #721c24; }
+
+        .customer-linked {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        .text-muted {
+            color: #999;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+
+            /* Off-canvas sidebar layout similar to admin dashboard */
+            .sidebar {
+                width: 260px;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                transform: translateX(-100%);
+                height: calc(100vh - 60px);
+                background: #ffffff;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.12);
+                transition: transform 0.3s ease;
+                z-index: 4000;
+                overflow-y: auto;
+            }
+
+            .navbar {
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .brand {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            /* Compact circular hamburger + profile icons */
+            .navbar #sidebarToggle {
+                margin-left: auto;
+                margin-right: 0.25rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+            }
+
+            .navbar #sidebarToggle i {
+                font-size: 1.1rem;
+            }
+
+            .navbar .user-menu {
+                order: 3;
+            }
+
+            .navbar .user-profile-dropdown .user-info-display {
+                padding: 0 !important;
+                width: 40px;
+                height: 40px;
+                border-radius: 9999px;
+                border: 1px solid rgba(255,255,255,0.7);
+                background: rgba(15,23,42,0.35);
+                justify-content: center;
+            }
+
+            .navbar .user-profile-dropdown .dropdown-arrow {
+                display: none;
+            }
+
+            .content { padding: 1rem 0.75rem; }
+
+            .registration-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-info-card {
+                flex-direction: column;
+            }
+
+            .action-buttons-card {
+                flex-wrap: wrap;
+            }
+
+            .table-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .table-section table { min-width: 720px; }
+        }
+
+        /* Mobile sidebar overlay for admin manage users */
+        #mobileSidebarOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            z-index: 3500;
+        }
+
+        @media (max-width: 768px) {
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open #mobileSidebarOverlay { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo" style="height: 40px;">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <button id="sidebarToggle" class="btn btn-outline" aria-label="Toggle sidebar" style="display:none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <div id="mobileSidebarOverlay" aria-hidden="true"></div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar Menu -->
+        {% include 'includes/admin_sidebar.html' %}
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-user-cog"></i> User Management</h1>
+                <p>Manage user registrations, approve new accounts, and oversee user access</p>
+            </div>
+
+            <!-- Alert Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                        <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Pending Registrations -->
+            {% if pending_users %}
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i class="fas fa-bell"></i> Pending User Registrations 
+                    <span class="notification-badge">{{ pending_users.count }}</span>
+                </h2>
+                <div class="pending-registrations">
+                    {% for pending_user in pending_users %}
+                    <div class="registration-card">
+                        <div class="user-info-card">
+                            <div class="user-avatar-large">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-details">
+                                <h4>{{ pending_user.full_name }}</h4>
+                                <p class="username">@{{ pending_user.username }}</p>
+                                <div class="user-meta">
+                                    <span class="role-badge role-{{ pending_user.role }}">
+                                        <i class="fas fa-{% if pending_user.role == 'customer' %}user{% else %}user-tie{% endif %}"></i>
+                                        {{ pending_user.get_role_display }}
+                                    </span>
+                                    {% if pending_user.customer_id %}
+                                    <span class="customer-link">
+                                        <i class="fas fa-link"></i> Linked Customer
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="contact-info">
+                                    {% if pending_user.email %}
+                                    <span><i class="fas fa-envelope"></i> {{ pending_user.email }}</span>
+                                    {% endif %}
+                                    {% if pending_user.phone %}
+                                    <span><i class="fas fa-phone"></i> {{ pending_user.phone }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="registration-time">
+                                    <i class="fas fa-clock"></i> Registered {{ pending_user.created_at|date:"M d, Y \a\\t g:i A" }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-buttons-card">
+                            <form method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_id" value="{{ pending_user.id }}">
+                                <button type="submit" name="approve_user" class="btn btn-success btn-approve">
+                                    <i class="fas fa-check"></i> Accept
+                                </button>
+                            </form>
+                            <form method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_id" value="{{ pending_user.id }}">
+                                <button type="submit" name="reject_user" class="btn btn-danger btn-reject" 
+                                        onclick="return confirm('Are you sure you want to reject this registration?')">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i class="fas fa-bell"></i> Pending User Registrations
+                </h2>
+                <div class="no-pending">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No Pending Registrations</h3>
+                    <p>All user registrations have been processed. New registration requests will appear here.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Users Table -->
+            <div class="table-section">
+                <h2 class="section-title">
+                    <i class="fas fa-users"></i> All System Users
+                </h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Role</th>
+                            <th>Customer Link</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in all_users %}
+                        <tr>
+                            <td><strong>{{ user.username }}</strong></td>
+                            <td>{{ user.full_name }}</td>
+                            <td>
+                                <span class="badge badge-{{ user.role }}">
+                                    {{ user.role|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if user.role == 'customer' %}
+                                    {% if user.customer_id %}
+                                        <span class="customer-linked">
+                                            <i class="fas fa-link"></i> Linked
+                                        </span>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-warning" onclick="openLinkModal({{ user.id }}, '{{ user.username|addslashes }}')">
+                                            <i class="fas fa-link"></i> Link Customer
+                                        </button>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ user.status }}">
+                                    {{ user.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ user.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    {% if user.id != request.user.id %}
+                                        <a href="?delete={{ user.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    {% else %}
+                                        <span class="badge badge-info">Current</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Link Customer Modal -->
+    <div id="linkCustomerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-link"></i> Link Customer Account</h2>
+                <span class="close-modal" onclick="closeLinkModal()">&times;</span>
+            </div>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="link_user_id" name="link_user_id">
+                    <div class="info-box">
+                        <div class="info-item">
+                            <strong>Username:</strong> <span id="link_username"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_link_id">Select Customer to Link:</label>
+                        <select id="customer_link_id" name="customer_link_id" required>
+                            <option value="">Choose a customer...</option>
+                            {% for customer in unlinked_customers %}
+                                <option value="{{ customer.id }}">{{ customer.customers_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeLinkModal()">Cancel</button>
+                    <button type="submit" name="link_customer" class="btn btn-success">
+                        <i class="fas fa-link"></i> Link Customer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            function updateHamburger() {
+                if (!toggleBtn) return;
+                if (window.innerWidth <= 992) {
+                    toggleBtn.style.display = 'inline-flex';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+            updateHamburger();
+            window.addEventListener('resize', updateHamburger);
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-open');
+                });
+            }
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+        })();
+
+        // Add Item to Customer Modal Functions
+        function showAddItemModal() {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.id = 'addItemModalOverlay';
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal-container';
+            
+            fetch('{% url "add_item_modal_content" %}')
+                .then(response => response.text())
+                .then(html => {
+                    modalContainer.innerHTML = html;
+                    modalOverlay.appendChild(modalContainer);
+                    document.body.appendChild(modalOverlay);
+                    document.body.style.overflow = 'hidden';
+                    
+                    setupAddItemFormHandler();
+                })
+                .catch(error => {
+                    console.error('Error loading modal:', error);
+                    alert('Error loading the form. Please try again.');
+                });
+        }
+
+        function closeAddItemModal() {
+            const modalOverlay = document.getElementById('addItemModalOverlay');
+            if (modalOverlay) {
+                modalOverlay.remove();
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function setupAddItemFormHandler() {
+            const form = document.getElementById('addItemForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    
+                    fetch('{% url "add_item_modal_content" %}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Success: ' + data.message);
+                            closeAddItemModal();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error submitting form. Please try again.');
+                    });
+                });
+            }
+        }
+
+        // Customer linking modal functions
+        function openLinkModal(userId, username) {
+            document.getElementById('link_user_id').value = userId;
+            document.getElementById('link_username').textContent = username;
+            document.getElementById('linkCustomerModal').style.display = 'flex';
+        }
+
+        function closeLinkModal() {
+            document.getElementById('linkCustomerModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('linkCustomerModal');
+            if (event.target == modal) {
+                closeLinkModal();
+            }
+        }
+
+        function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = '{% url "logout" %}';
+            }
+        }
+    </script>
+
+    <!-- Admin Profile Modal -->
+    {% include 'modals/admin_profile_modal.html' %}
+</body>
+</html>

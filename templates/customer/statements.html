@@ -1,0 +1,441 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Statements - Arjen Appliances Trading</title>
+    <link rel="icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/arjen_logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar - aligned with admin/staff */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand img.logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: var(--shadow);
+            padding: 2rem 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 0.5rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #f8f9fa;
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Statements Grid */
+        .statements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .statement-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .statement-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .statement-header.paid {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+        }
+
+        .statement-header.partial {
+            background: linear-gradient(135deg, var(--warning), #d68910);
+        }
+
+        .statement-header.overdue {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+        }
+
+        .statement-month {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .statement-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .statement-status {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .statement-content {
+            padding: 2rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .info-value {
+            color: #666;
+        }
+
+        .statement-actions {
+            padding: 0 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .statements-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo" class="logo">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'customer_dashboard' %}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_transactions' %}" class="nav-link">
+                        <i class="fas fa-credit-card"></i>
+                        <span>All Transactions</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_items' %}" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>My Items</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'monthly_statements' %}" class="nav-link active">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>Monthly Statements</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Monthly Statements</h1>
+                <p class="page-subtitle">Archive of your monthly billing statements and payment history</p>
+                <a href="{% url 'customer_dashboard' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+            
+            <!-- Statements Summary -->
+            {% if monthly_statements %}
+            <div class="statements-summary">
+                <div class="summary-card info">
+                    <div class="summary-icon"><i class="fas fa-file-invoice"></i></div>
+                    <div class="summary-content">
+                        <div class="summary-amount">{{ monthly_statements|length }}</div>
+                        <div class="summary-label">Total Statements</div>
+                        <div class="summary-subtitle">Monthly records</div>
+                    </div>
+                </div>
+                <div class="summary-card success">
+                    <div class="summary-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="summary-content">
+                        <div class="summary-amount">{{ paid_statements }}</div>
+                        <div class="summary-label">Paid Statements</div>
+                        <div class="summary-subtitle">Completed payments</div>
+                    </div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="summary-icon"><i class="fas fa-clock"></i></div>
+                    <div class="summary-content">
+                        <div class="summary-amount">{{ pending_statements }}</div>
+                        <div class="summary-label">Pending Statements</div>
+                        <div class="summary-subtitle">Awaiting payment</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if monthly_statements %}
+            <!-- Statements Grid -->
+            <div class="statements-grid">
+                {% for statement in monthly_statements %}
+                <div class="statement-card">
+                    <div class="statement-header {{ statement.status }}">
+                        <div class="statement-month">
+                            {{ statement.month_name }} {{ statement.statement_year }}
+                        </div>
+                        <div class="statement-amount">₱{{ statement.remaining_balance|floatformat:2 }}</div>
+                        <div class="statement-status">{{ statement.status|upper }}</div>
+                    </div>
+                    <div class="statement-content">
+                        <div class="info-row">
+                            <span class="info-label">Statement Period:</span>
+                            <span class="info-value">
+                                {{ statement.month_name }} 1 - {{ statement.month_name }} {% now "t" %}, {{ statement.statement_year }}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Total Due:</span>
+                            <span class="info-value">₱{{ statement.total_due|floatformat:2 }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Amount Paid:</span>
+                            <span class="info-value">₱{{ statement.amount_paid|floatformat:2 }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Remaining Balance:</span>
+                            <span class="info-value">₱{{ statement.remaining_balance|floatformat:2 }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Due Date:</span>
+                            <span class="info-value">{{ statement.due_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Transaction #:</span>
+                            <span class="info-value">{{ statement.transaction_number }}</span>
+                        </div>
+                    </div>
+                    <div class="statement-actions">
+                        <button class="btn btn-primary" onclick="alert('PDF download functionality coming soon!')">
+                            <i class="fas fa-download"></i>
+                            Download PDF
+                        </button>
+                        <button class="btn btn-outline" onclick="alert('View details functionality coming soon!')">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <i class="fas fa-file-invoice"></i>
+                <h3>No Monthly Statements</h3>
+                <p>Your monthly statements will appear here once they are generated.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="{% url 'customer_dashboard' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <!-- Customer Profile Modal -->
+    {% include 'modals/customer_profile_modal.html' %}
+</body>
+</html>

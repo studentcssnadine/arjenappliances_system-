@@ -1,0 +1,312 @@
+<!-- Edit Item Modal Content -->
+<div class="modal-header">
+    <button class="close-btn" onclick="closeEditItemModal()">
+        <i class="fas fa-times"></i>
+    </button>
+    <h2><i class="fas fa-edit"></i> Edit Item</h2>
+    <p>Update item details for {{ item.customer.customers_name }}</p>
+</div>
+
+<div class="modal-content">
+    <form id="editItemForm" method="POST" action="{% url 'edit_item_modal_content' item.id %}">
+        {% csrf_token %}
+        <div class="form-fields">
+            <div class="form-group">
+                <label for="item_name">Item Name</label>
+                <input type="text" name="item_name" id="item_name" value="{{ item.item_name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="item_model">Item Model</label>
+                <input type="text" name="item_model" id="item_model" value="{{ item.item_model }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="original_price">Original Price (₱)</label>
+                <input type="number" name="original_price" id="original_price" step="0.01" min="0" value="{{ item.original_price }}" required onchange="calculateTotal()">
+            </div>
+            
+            <div class="form-group">
+                <label for="downpayment">Downpayment (₱)</label>
+                <input type="number" name="downpayment" id="downpayment" step="0.01" min="0" value="{{ item.downpayment }}" onchange="calculateTotal()">
+            </div>
+            
+            <div class="form-group">
+                <label for="good_as_cash">Good as Cash</label>
+                <select name="good_as_cash" id="good_as_cash" required onchange="toggleGoodAsCash()">
+                    <option value="">Select Option</option>
+                    <option value="yes" {% if item.good_as_cash == 'yes' %}selected{% endif %}>Yes</option>
+                    <option value="no" {% if item.good_as_cash == 'no' %}selected{% endif %}>No</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="rebate_amount">Rebate Amount (₱)</label>
+                <input type="number" name="rebate_amount" id="rebate_amount" step="0.01" min="0" value="{{ item.rebate_amount }}" onchange="calculateTotal()">
+            </div>
+            
+            <div class="form-group" id="monthly_due_group">
+                <label for="monthly_due">Monthly Due (₱)</label>
+                <input type="number" name="monthly_due" id="monthly_due" step="0.01" min="0" value="{{ item.monthly_due }}" onchange="calculateTotal()">
+            </div>
+            
+            <div class="form-group" id="term_months_group">
+                <label for="term_months">Term (Months)</label>
+                <input type="number" name="term_months" id="term_months" min="1" max="60" value="{{ item.term_months }}" onchange="calculateTotal()">
+            </div>
+            
+            <div class="form-group">
+                <label for="purchase_date">Purchase Date</label>
+                <input type="date" name="purchase_date" id="purchase_date" required value="{{ item.purchase_date|date:'Y-m-d' }}">
+            </div>
+        </div>
+
+        <div class="calculation-display">
+            <div class="total-display">
+                <strong>Total Contract Amount: <span id="total_cost">₱{{ item.total_contract_amount|floatformat:2 }}</span></strong>
+            </div>
+            <div class="formula-display">
+                <small id="formula">
+                    {% if item.good_as_cash == 'yes' %}
+                        Formula: Original Price (₱{{ item.original_price|floatformat:2 }}) - Rebate (₱{{ item.rebate_amount|floatformat:2 }})
+                    {% else %}
+                        Formula: (₱{{ item.monthly_due|floatformat:2 }} × {{ item.term_months }} months) + ₱{{ item.downpayment|floatformat:2 }} downpayment - ₱{{ item.rebate_amount|floatformat:2 }} rebate
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeEditItemModal()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Item
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+/* Modal Container Styles - Exact match to original arjensystem */
+.modal-container {
+    max-width: 800px;
+    width: 90%;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    position: relative;
+    margin: 2% auto;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    padding: 1.5rem 2rem;
+    position: relative;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.modal-header p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-content {
+    padding: 0;
+}
+
+.form-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.calculation-display {
+    background: #f8fafc;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.total-display {
+    font-size: 1.2rem;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+
+.formula-display {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.modal-actions {
+    padding: 1.5rem 2rem;
+    background: #f9fafb;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-container {
+        width: 95%;
+        margin: 1rem auto;
+    }
+    
+    .form-fields {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .calculation-display,
+    .modal-actions {
+        padding: 1rem 1.5rem;
+    }
+}
+</style>
+
+<script>
+// Toggle Good as Cash fields
+function toggleGoodAsCash() {
+    const goodAsCash = document.getElementById('good_as_cash').value;
+    const monthlyGroup = document.getElementById('monthly_due_group');
+    const termGroup = document.getElementById('term_months_group');
+    
+    if (goodAsCash === 'yes') {
+        monthlyGroup.style.display = 'none';
+        termGroup.style.display = 'none';
+        document.getElementById('monthly_due').value = '0';
+        document.getElementById('term_months').value = '1';
+    } else {
+        monthlyGroup.style.display = 'block';
+        termGroup.style.display = 'block';
+    }
+    
+    calculateTotal();
+}
+
+// Calculate total contract amount
+function calculateTotal() {
+    const originalPrice = parseFloat(document.getElementById('original_price').value) || 0;
+    const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+    const rebate = parseFloat(document.getElementById('rebate_amount').value) || 0;
+    const monthly = parseFloat(document.getElementById('monthly_due').value) || 0;
+    const term = parseInt(document.getElementById('term_months').value) || 0;
+    const goodAsCash = document.getElementById('good_as_cash').value;
+    
+    let total = 0;
+    let formula = '';
+    
+    if (goodAsCash === 'yes') {
+        total = originalPrice - rebate;
+        formula = `Formula: Original Price (₱${originalPrice.toLocaleString()}) - Rebate (₱${rebate.toLocaleString()})`;
+    } else {
+        total = (monthly * term) + downpayment - rebate;
+        formula = `Formula: (₱${monthly.toLocaleString()} × ${term} months) + ₱${downpayment.toLocaleString()} downpayment - ₱${rebate.toLocaleString()} rebate`;
+    }
+    
+    document.getElementById('total_cost').textContent = '₱' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('formula').textContent = formula;
+}
+
+// Initialize form
+document.addEventListener('DOMContentLoaded', function() {
+    toggleGoodAsCash();
+    calculateTotal();
+});
+</script>

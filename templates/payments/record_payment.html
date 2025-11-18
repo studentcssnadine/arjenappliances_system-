@@ -1,0 +1,791 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Payment - ARJEN APPLIANCES TRADING</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --text: #333;
+            --text-light: #777;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand img {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            font-weight: 500;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .menu-items {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            margin: 0;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            white-space: nowrap;
+        }
+
+        .menu-item:hover a,
+        .menu-item.active a {
+            background: #f8f9fa;
+            color: var(--primary);
+            border-left-color: var(--secondary);
+        }
+
+        .logout-item {
+            border-top: 1px solid #e0e0e0;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .logout-item a {
+            color: #dc3545 !important;
+        }
+
+        .logout-item:hover a {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border-left-color: #dc3545 !important;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            background: #f4f6f9;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        /* Payment Form */
+        .payment-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .payment-form {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            opacity: 0.9;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .required {
+            color: var(--accent);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        /* Recent Payments */
+        .recent-payments {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .payments-header {
+            background: linear-gradient(135deg, var(--primary), #34495e);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payments-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .payments-count {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .payments-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .payment-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .payment-item:hover {
+            background: #f8f9fa;
+        }
+
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-customer {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .payment-details {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .payment-amount {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--success);
+        }
+
+        .payment-date {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .no-payments {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .no-payments i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .payment-container { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 992px) {
+            .navbar { padding: 0.75rem 1rem; }
+            .content { padding: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; }
+            .form-actions { flex-direction: column; }
+            .page-header { padding: 1.25rem; }
+            .payment-form { padding: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{% static 'images/arjen_logo.png' %}" alt="Arjen Appliances Logo">
+            <div class="brand-text">ARJEN APPLIANCES TRADING</div>
+        </div>
+        <div class="user-menu">
+            {% include 'includes/user_profile_dropdown.html' %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar Menu -->
+        {% if user.role == 'admin' %}
+            {% include 'includes/admin_sidebar.html' %}
+        {% else %}
+            {% include 'includes/staff_admin_sidebar.html' %}
+        {% endif %}
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-credit-card"></i> Record Payment
+                </h1>
+                <p class="page-subtitle">Record customer payments and track payment history</p>
+            </div>
+
+            <!-- Payment Container -->
+            <div class="payment-container">
+                <!-- Payment Form -->
+                <div class="payment-form">
+                    <div class="form-header">
+                        <h2><i class="fas fa-money-bill-wave"></i> New Payment Entry</h2>
+                        <p>Complete the form below to record a customer payment</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" id="paymentForm" action="{% url 'record_payment' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="customer_id">Customer <span class="required">*</span></label>
+                            <select name="customer_id" id="customer_id" required>
+                                <option value="">Select a customer...</option>
+                                {% for customer in customers %}
+                                    <option value="{{ customer.id }}" data-monthly-due="{{ customer.monthly_due|default:0 }}">
+                                        {{ customer.customers_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Customer Payment Details -->
+                        <div id="customerPaymentDetails" style="display: none; background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                            <h4 style="color: #1e3a8a; margin-bottom: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> Customer Payment Information
+                            </h4>
+                            <div class="payment-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div class="info-item">
+                                    <strong>Monthly Due:</strong>
+                                    <span id="customerMonthlyDue">₱0.00</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Rebate Available:</strong>
+                                    <span id="customerRebate">₱0.00</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Suggested Amount:</strong>
+                                    <span id="suggestedAmount" style="color: #2ecc71; font-weight: 600;">₱0.00</span>
+                                </div>
+                            </div>
+                            <div id="rebateInfo" style="margin-top: 0.5rem; padding: 0.5rem; background: #fff3cd; border-radius: 4px; display: none;">
+                                <small style="color: #856404;">
+                                    <i class="fas fa-star"></i> Rebate will be applied for early payments or on-time payments.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="transaction_number">Transaction Number</label>
+                            <input type="text" name="transaction_number" id="transaction_number" placeholder="Auto-generated" readonly style="background-color: #f8f9fa; color: #6c757d;">
+                            <small style="color: #6c757d; font-size: 0.8rem;">Transaction number will be automatically generated</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="payment_date">Payment Date <span class="required">*</span></label>
+                            <input type="date" name="payment_date" id="payment_date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount_paid">Amount Paid <span class="required">*</span></label>
+                            <input type="number" name="amount_paid" id="amount_paid" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="payment_method">Payment Method</label>
+                            <select name="payment_method" id="payment_method">
+                                <option value="Cash">Cash</option>
+                                <option value="Check">Check</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="GCash">GCash</option>
+                                <option value="PayMaya">PayMaya</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rebate_applied">Rebate Applied</label>
+                            <select name="rebate_applied" id="rebate_applied" onchange="toggleRebateAmount()">
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="rebate_amount_group" style="display: none;">
+                            <label for="rebate_amount">Rebate Amount (₱)</label>
+                            <input type="number" name="rebate_amount" id="rebate_amount" step="0.01" min="0" placeholder="0.00">
+                            <small style="color: #6c757d; font-size: 0.8rem;">Enter the rebate amount to be applied to this payment</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Notes <span class="required">*</span></label>
+                            <textarea name="notes" id="notes" rows="3" placeholder="Please describe this payment (required)" required></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" name="add_payment" class="btn btn-success">
+                                <i class="fas fa-save"></i> Record Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('payment_date').value = new Date().toISOString().split('T')[0];
+
+        // Add form submission debugging
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            console.log('Form submission started');
+            
+            // Get form data for debugging
+            const formData = new FormData(this);
+            console.log('Form data:');
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ': ' + value);
+            }
+            
+            // Check required fields
+            const customer = document.getElementById('customer_id').value;
+            const paymentDate = document.getElementById('payment_date').value;
+            const amount = document.getElementById('amount_paid').value;
+            
+            console.log('Validation check:');
+            console.log('Customer:', customer);
+            console.log('Payment Date:', paymentDate);
+            console.log('Amount:', amount);
+            
+            if (!customer) {
+                alert('Please select a customer');
+                e.preventDefault();
+                return false;
+            }
+            
+            if (!paymentDate) {
+                alert('Please enter a payment date');
+                e.preventDefault();
+                return false;
+            }
+            
+            if (!amount || parseFloat(amount) <= 0) {
+                alert('Please enter a valid payment amount');
+                e.preventDefault();
+                return false;
+            }
+            
+            console.log('Form validation passed, submitting...');
+        });
+
+        // Toggle rebate amount field visibility
+        function toggleRebateAmount() {
+            const rebateApplied = document.getElementById('rebate_applied').value;
+            const rebateAmountGroup = document.getElementById('rebate_amount_group');
+            const rebateAmountInput = document.getElementById('rebate_amount');
+            
+            if (rebateApplied === 'Yes') {
+                rebateAmountGroup.style.display = 'block';
+                rebateAmountInput.required = true;
+                
+                // Auto-fill with suggested rebate amount if available
+                const customerRebate = document.getElementById('customerRebate');
+                if (customerRebate && customerRebate.textContent !== '₱0.00') {
+                    const rebateValue = parseFloat(customerRebate.textContent.replace(/[₱,]/g, ''));
+                    rebateAmountInput.value = rebateValue.toFixed(2);
+                }
+            } else {
+                rebateAmountGroup.style.display = 'none';
+                rebateAmountInput.required = false;
+                rebateAmountInput.value = '';
+            }
+        }
+
+        // Show customer payment details when customer is selected
+        document.getElementById('customer_id').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const monthlyDue = parseFloat(selectedOption.dataset.monthlyDue) || 0;
+            const customerDetailsDiv = document.getElementById('customerPaymentDetails');
+            
+            if (this.value && monthlyDue > 0) {
+                // Show customer payment details
+                customerDetailsDiv.style.display = 'block';
+                
+                // Update payment information
+                document.getElementById('customerMonthlyDue').textContent = '₱' + monthlyDue.toFixed(2);
+                
+                // Calculate rebate (example: 5% for early payment)
+                const rebateAmount = monthlyDue * 0.05;
+                document.getElementById('customerRebate').textContent = '₱' + rebateAmount.toFixed(2);
+                
+                // Suggested amount (monthly due minus rebate if applicable)
+                const today = new Date();
+                const paymentDate = new Date(document.getElementById('payment_date').value || today);
+                const isEarlyPayment = paymentDate <= today;
+                
+                const suggestedAmount = isEarlyPayment ? (monthlyDue - rebateAmount) : monthlyDue;
+                document.getElementById('suggestedAmount').textContent = '₱' + suggestedAmount.toFixed(2);
+                
+                // Show rebate info if applicable
+                const rebateInfo = document.getElementById('rebateInfo');
+                if (isEarlyPayment) {
+                    rebateInfo.style.display = 'block';
+                } else {
+                    rebateInfo.style.display = 'none';
+                }
+                
+                // Auto-fill amount paid
+                document.getElementById('amount_paid').value = suggestedAmount.toFixed(2);
+            } else {
+                customerDetailsDiv.style.display = 'none';
+                document.getElementById('amount_paid').value = '';
+            }
+        });
+
+        // Set active menu item
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const currentPath = window.location.pathname;
+            
+            menuItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+
+        // Add Item to Customer Modal Functions
+        function showAddItemModal() {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.id = 'addItemModalOverlay';
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal-container';
+            
+            fetch('{% url "add_item_modal_content" %}')
+                .then(response => response.text())
+                .then(html => {
+                    modalContainer.innerHTML = html;
+                    modalOverlay.appendChild(modalContainer);
+                    document.body.appendChild(modalOverlay);
+                    document.body.style.overflow = 'hidden';
+                    
+                    setupAddItemFormHandler();
+                })
+                .catch(error => {
+                    console.error('Error loading modal:', error);
+                    alert('Error loading the form. Please try again.');
+                });
+        }
+
+        function closeAddItemModal() {
+            const modalOverlay = document.getElementById('addItemModalOverlay');
+            if (modalOverlay) {
+                modalOverlay.remove();
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function setupAddItemFormHandler() {
+            const form = document.getElementById('addItemForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    
+                    fetch('{% url "add_item_modal_content" %}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Success: ' + data.message);
+                            closeAddItemModal();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error submitting form. Please try again.');
+                    });
+                });
+            }
+        }
+
+        function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = '{% url "logout" %}';
+            }
+        }
+    </script>
+
+    <!-- Profile Modal -->
+    {% if user.role == 'admin' %}
+    {% include 'modals/admin_profile_modal.html' %}
+    {% elif user.role == 'staff' %}
+    {% include 'modals/staff_profile_modal.html' %}
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!-- Modal Content - Matches original arjensystem add_item_modal_content.php exactly -->
+<div class="modal-header">
+    <button class="close-btn" onclick="closeAddItemModal()">
+        <i class="fas fa-times"></i>
+    </button>
+    <h2><i class="fas fa-plus-circle"></i> Add Item to Customer</h2>
+    <p>Add a new purchase to an existing customer's account</p>
+</div>
+
+<div class="modal-content">
+    <form id="addItemForm" method="POST" action="{% url 'add_item_modal_content' %}">
+        {% csrf_token %}
+        <div class="form-fields">
+            <div class="form-group">
+                <label for="customer_id">Select Customer</label>
+                <select name="customer_id" id="customer_id" required onchange="showCustomerInfo()">
+                    <option value="">Choose a customer...</option>
+                    {% for customer in customers %}
+                        {% if customer.current_items >= 3 %}
+                            <option value="{{ customer.id }}" 
+                                    data-name="{{ customer.customers_name }}"
+                                    data-address="{{ customer.address }}"
+                                    data-phone="{{ customer.contact }}"
+                                    data-items="{{ customer.current_items }}"
+                                    disabled style="color: #dc3545; background: #f8d7da;">
+                                {{ customer.customers_name }} ({{ customer.current_items }}/3 items) - LIMIT REACHED
+                            </option>
+                        {% else %}
+                            <option value="{{ customer.id }}" 
+                                    data-name="{{ customer.customers_name }}"
+                                    data-address="{{ customer.address }}"
+                                    data-phone="{{ customer.contact }}"
+                                    data-items="{{ customer.current_items }}">
+                                {{ customer.customers_name }} ({{ customer.current_items }}/3 items)
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="customerInfo" class="customer-info" style="display: none;">
+                <div class="info-card">
+                    <h4>Customer Information</h4>
+                    <p><strong>Name:</strong> <span id="customerName"></span></p>
+                    <p><strong>Address:</strong> <span id="customerAddress"></span></p>
+                    <p><strong>Phone:</strong> <span id="customerPhone"></span></p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="item_name">Item Name</label>
+                    <input type="text" name="item_name" id="item_name" required 
+                           placeholder="e.g., Samsung, LG, Haier">
+                </div>
+                <div class="form-group">
+                    <label for="item_model">Item Model</label>
+                    <input type="text" name="item_model" id="item_model" required 
+                           placeholder="e.g., Refrigerator 36CX575">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="original_price">Original Price (Cash Price) (₱)</label>
+                    <input type="number" name="original_price" id="original_price" step="0.01" required 
+                           placeholder="Actual item price if paid in cash" onchange="calculateTotal()">
+                </div>
+                <div class="form-group">
+                    <label for="downpayment">Downpayment (₱)</label>
+                    <input type="number" name="downpayment" id="downpayment" step="0.01" value="0" 
+                           placeholder="Initial payment amount" onchange="calculateTotal()">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="good_as_cash">Good as Cash</label>
+                    <select name="good_as_cash" id="good_as_cash" required onchange="calculateTotal();">
+                        <option value="">Choose...</option>
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                    </select>
+                    <small>
+                        <i class="fas fa-info-circle"></i> 
+                        Select "Yes" if customer will pay in full cash
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="rebate_amount">Rebate Amount (₱)</label>
+                    <input type="number" name="rebate_amount" id="rebate_amount" step="0.01" value="0" 
+                           placeholder="Enter 0 for Good as Cash" onchange="calculateTotal()">
+                    <small>
+                        <i class="fas fa-info-circle"></i> 
+                        Discount for paying on or before due date (Enter 0 if Good as Cash)
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="monthly_due">Monthly Payment (₱)</label>
+                    <input type="number" name="monthly_due" id="monthly_due" step="0.01" required 
+                           placeholder="Monthly installment amount" onchange="calculateTotal()">
+                </div>
+                <div class="form-group">
+                    <label for="term_months">Term (Months)</label>
+                    <input type="number" name="term_months" id="term_months" min="1" max="60" required 
+                           placeholder="Enter number of months" onchange="calculateTotal()">
+                    <small>
+                        <i class="fas fa-info-circle"></i> 
+                        Enter payment term in months (e.g., 6, 12, 24)
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="total_cost">Gross Price (Total Installment Cost)</label>
+                <div class="total-display" id="total_cost">₱0.00</div>
+                <div class="formula" id="formula">Formula: (Term × Monthly Payment) + Downpayment</div>
+            </div>
+
+            <div class="form-group">
+                <label for="purchase_date">Purchase Date</label>
+                <input type="date" name="purchase_date" id="purchase_date" required value="{{ today }}">
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeAddItemModal()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Item to Customer
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+/* Modal Container Styles - Exact match to original arjensystem */
+.modal-container {
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    position: relative;
+    animation: modalAppear 0.3s ease-out;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.modal-content {
+    padding: 2rem;
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.form-fields {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal-actions {
+    flex-shrink: 0;
+    margin-top: auto;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 2rem;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(90deg);
+}
+
+.modal-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.customer-info {
+    margin: 1rem 0;
+}
+
+.info-card {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.info-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: #374151;
+}
+
+.info-card p {
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
+}
+
+.total-display {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.formula {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+    font-style: italic;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+@media (max-width: 768px) {
+    .modal-container {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+// Set today's date as default
+document.getElementById('purchase_date').value = new Date().toISOString().split('T')[0];
+
+// Show customer information when selected
+function showCustomerInfo() {
+    const select = document.getElementById('customer_id');
+    const selectedOption = select.options[select.selectedIndex];
+    const customerInfo = document.getElementById('customerInfo');
+    
+    if (selectedOption.value) {
+        document.getElementById('customerName').textContent = selectedOption.dataset.name;
+        document.getElementById('customerAddress').textContent = selectedOption.dataset.address || 'No address';
+        document.getElementById('customerPhone').textContent = selectedOption.dataset.phone || 'No phone';
+        customerInfo.style.display = 'block';
+        
+        // Check item limit
+        const itemCount = parseInt(selectedOption.dataset.items) || 0;
+        if (itemCount >= 3) {
+            alert('This customer has reached the maximum limit of 3 items. Please contact admin if you need to add more items.');
+            select.value = '';
+            customerInfo.style.display = 'none';
+        }
+    } else {
+        customerInfo.style.display = 'none';
+    }
+}
+
+// Calculate total cost
+function calculateTotal() {
+    const originalPrice = parseFloat(document.getElementById('original_price').value) || 0;
+    const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+    const rebate = parseFloat(document.getElementById('rebate_amount').value) || 0;
+    const monthly = parseFloat(document.getElementById('monthly_due').value) || 0;
+    const term = parseInt(document.getElementById('term_months').value) || 0;
+    const goodAsCash = document.getElementById('good_as_cash').value;
+    
+    let total = 0;
+    let formula = '';
+    
+    if (goodAsCash === 'yes') {
+        total = originalPrice - rebate;
+        formula = `Formula: Original Price (₱${originalPrice.toLocaleString()}) - Rebate (₱${rebate.toLocaleString()})`;
+    } else {
+        total = (monthly * term) + downpayment - rebate;
+        formula = `Formula: (₱${monthly.toLocaleString()} × ${term} months) + ₱${downpayment.toLocaleString()} downpayment - ₱${rebate.toLocaleString()} rebate`;
+    }
+    
+    document.getElementById('total_cost').textContent = '₱' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('formula').textContent = formula;
+}
+
+
+</script>
