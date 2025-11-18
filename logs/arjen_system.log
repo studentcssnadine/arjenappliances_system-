@@ -5305,3 +5305,4 @@ INFO 2025-11-16 22:35:52,832 basehttp 11696 36808 "GET /reports/ HTTP/1.1" 200 6
 INFO 2025-11-18 10:38:35,985 autoreload 42528 37988 Watching for file changes with StatReloader
 INFO 2025-11-18 10:38:39,013 basehttp 42528 41756 "GET / HTTP/1.1" 200 25058
 INFO 2025-11-18 10:38:46,239 basehttp 42528 41756 "GET /login/ HTTP/1.1" 200 5650
+INFO 2025-11-18 15:50:05,814 autoreload 39636 40176 Watching for file changes with StatReloader
