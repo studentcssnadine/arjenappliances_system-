@@ -97,7 +97,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://arjenappliances_system_user:0jZEnTwQ67ndAPoEwN5pMyxV4W06n1if@dpg-d4e10o2dbo4c73d6f420-a/arjenappliances_system'
+        default=os.environ.get('postgresql://arjenappliances_system_user:0jZEnTwQ67ndAPoEwN5pMyxV4W06n1if@dpg-d4e10o2dbo4c73d6f420-a/arjenappliances_system')  # Fetches DATABASE_URL from Render environment
     )
 }
 
