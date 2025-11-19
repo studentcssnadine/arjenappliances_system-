@@ -56,5 +56,4 @@ urlpatterns = [
     
     # User Management (Admin only)
     path('users/manage/', views.manage_users, name='manage_users'),
-
-   
+]
