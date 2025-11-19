@@ -15,6 +15,8 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.register, name='register'),
+    # One-time admin bootstrap (remove after use)
+    path('bootstrap-superuser/', views.bootstrap_superuser, name='bootstrap_superuser'),
     
     # Dashboards
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),

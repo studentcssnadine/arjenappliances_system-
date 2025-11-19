@@ -11,6 +11,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 import json
+import os
 import logging
 import re
 from .models import (
@@ -271,6 +272,47 @@ def user_logout(request):
         )
     logout(request)
     return redirect('login')
+
+def bootstrap_superuser(request):
+    """One-time endpoint to create a superuser on environments without shell.
+    Security controls:
+    - Requires query param ?token=... that matches ADMIN_SETUP_TOKEN env var.
+    - Reads DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD from env.
+    - If any superuser already exists, it does nothing.
+    Remove this route and clear env vars after successful use.
+    """
+    token = request.GET.get('token', '')
+    expected = os.environ.get('ADMIN_SETUP_TOKEN', '')
+    if not expected or token != expected:
+        return JsonResponse({'ok': False, 'error': 'Unauthorized. Missing or invalid token.'}, status=403)
+
+    # If superuser exists, no action
+    if CustomUser.objects.filter(is_superuser=True).exists():
+        return JsonResponse({'ok': True, 'message': 'Superuser already exists. No action taken.'})
+
+    username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
+    email = os.environ.get('DJANGO_SUPERUSER_EMAIL')
+    password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
+
+    if not all([username, email, password]):
+        return JsonResponse({'ok': False, 'error': 'Missing DJANGO_SUPERUSER_* env vars.'}, status=400)
+
+    try:
+        user = CustomUser.objects.create_superuser(
+            username=username,
+            email=email,
+            password=password,
+        )
+        # Align with custom auth flow
+        user.role = 'admin'
+        user.status = 'active'
+        user.is_staff = True
+        user.save()
+        return JsonResponse({'ok': True, 'message': f'Superuser {username} created and activated.'})
+    except Exception as e:
+        logger = logging.getLogger('myapp')
+        logger.error(f'Bootstrap superuser failed: {e}')
+        return JsonResponse({'ok': False, 'error': 'Failed to create superuser.'}, status=500)
 
 def register(request):
     """User registration view - matches original arjensystem"""
