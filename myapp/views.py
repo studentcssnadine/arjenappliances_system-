@@ -13,6 +13,7 @@ from dateutil.relativedelta import relativedelta
 import json
 import logging
 import re
+from django.core.management import call_command
 from .models import (
     CustomUser, Customer, PaymentRecord, CustomerItem, 
     Transaction, MonthlyStatement, UserActivityLog, CustomerHistory
@@ -271,6 +272,27 @@ def user_logout(request):
         )
     logout(request)
     return redirect('login')
+
+def run_migrations(request):
+    """Secure endpoint to run Django migrations (for environments without shell).
+    Usage: /run-migrations/?token=YOUR_TOKEN
+    Security: requires MIGRATE_TOKEN env var to match token.
+    Remove this route after successful migration.
+    """
+    import os
+    token = request.GET.get('token', '')
+    expected = os.environ.get('MIGRATE_TOKEN', '')
+    if not expected or token != expected:
+        return JsonResponse({'ok': False, 'error': 'Unauthorized. Missing or invalid token.'}, status=403)
+
+    try:
+        # Apply migrations without prompts
+        call_command('migrate', interactive=False, verbosity=1)
+        return JsonResponse({'ok': True, 'message': 'Migrations applied successfully.'})
+    except Exception as e:
+        logger = logging.getLogger('myapp')
+        logger.error(f'Running migrations failed: {e}')
+        return JsonResponse({'ok': False, 'error': 'Migration failed.'}, status=500)
 
 def register(request):
     """User registration view - matches original arjensystem"""
