@@ -593,6 +593,7 @@
                                 <th>Time</th>
                                 <th>Term</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -612,6 +613,19 @@
                                         </td>
                                         <td>{{ customer.term }} months</td>
                                         <td><span class="status-badge status-fully-paid">Fully Paid</span></td>
+                                        <td>
+                                            {% if user.role == 'admin' %}
+                                                <button class="btn btn-sm btn-success restore-item-btn"
+                                                        data-history-id="{{ customer.id }}"
+                                                        data-customer-name="{{ customer.customers_name }}"
+                                                        data-item-name="{{ customer.item_name }}"
+                                                        title="Retake this customer back to active status">
+                                                    <i class="fas fa-undo"></i> Retake
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">Admin Only</span>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             {% else %}

@@ -478,13 +478,15 @@
             background: rgba(0, 0, 0, 0.5) !important;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            display: flex !important;
+            /* hidden by default; shown when .show class is added */
+            display: none !important;
             align-items: center !important;
             justify-content: center !important;
             z-index: 10000 !important;
             padding: 2rem !important;
             overflow-y: auto !important;
         }
+        .modal-overlay.show { display: flex !important; }
 
         .modal-container {
             max-width: 800px !important;
@@ -1296,6 +1298,8 @@
                     modalContainer.innerHTML = html;
                     modalOverlay.appendChild(modalContainer);
                     document.body.appendChild(modalOverlay);
+                    // Make overlay visible using the shared .show toggle
+                    modalOverlay.classList.add('show');
                     
                     // Setup form handler after content is loaded
                     setupEditItemFormHandler();
