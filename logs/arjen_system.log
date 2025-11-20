@@ -5320,3 +5320,18 @@ INFO 2025-11-20 09:36:26,473 basehttp 23008 37880 code 400, message Bad request 
 ERROR 2025-11-20 09:36:26,483 basehttp 23008 37880 You're accessing the development server over HTTPS, but it only supports HTTP.
 INFO 2025-11-20 09:36:26,494 basehttp 23008 45848 code 400, message Bad request version ("\x91\x9eÿ\x06\x16\x9b©V\x8eÀ$»Í\x07h'√ßCk")
 ERROR 2025-11-20 09:36:26,495 basehttp 23008 45848 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 20:34:19,510 autoreload 13148 6760 Watching for file changes with StatReloader
+INFO 2025-11-20 20:34:28,192 autoreload 13148 6760 C:\Users\ACER\Desktop\arjenappliances_system\myproject\myapp\views.py changed, reloading.
+INFO 2025-11-20 20:34:29,242 autoreload 12808 17092 Watching for file changes with StatReloader
+INFO 2025-11-20 20:34:45,135 basehttp 12808 15764 code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x06')
+ERROR 2025-11-20 20:34:45,138 basehttp 12808 15764 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 20:34:45,158 basehttp 12808 14744 code 400, message Bad request version ('_¨')
+ERROR 2025-11-20 20:34:45,167 basehttp 12808 14744 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 20:34:47,595 autoreload 12808 17092 C:\Users\ACER\Desktop\arjenappliances_system\myproject\myapp\forms.py changed, reloading.
+INFO 2025-11-20 20:34:48,990 autoreload 8184 12908 Watching for file changes with StatReloader
+INFO 2025-11-20 20:43:34,095 autoreload 8184 12908 C:\Users\ACER\Desktop\arjenappliances_system\myproject\myapp\views.py changed, reloading.
+INFO 2025-11-20 20:43:35,261 autoreload 17296 14856 Watching for file changes with StatReloader
+INFO 2025-11-20 20:56:51,863 autoreload 17296 14856 C:\Users\ACER\Desktop\arjenappliances_system\myproject\myapp\views.py changed, reloading.
+INFO 2025-11-20 20:56:53,031 autoreload 8880 5152 Watching for file changes with StatReloader
+INFO 2025-11-20 21:05:56,434 autoreload 8880 5152 C:\Users\ACER\Desktop\arjenappliances_system\myproject\myapp\views.py changed, reloading.
+INFO 2025-11-20 21:05:57,451 autoreload 5560 14528 Watching for file changes with StatReloader

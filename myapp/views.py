@@ -2645,17 +2645,22 @@ def customer_history(request):
     
     # Get history data (with fallback if table doesn't exist)
     try:
-        fully_paid_customers = CustomerHistory.objects.filter(final_status='fully_paid').order_by('-completion_date')
-        pulled_out_customers = CustomerHistory.objects.filter(final_status='pulled_out').order_by('-completion_date')
+        # Build querysets
+        fully_paid_qs = CustomerHistory.objects.filter(final_status='fully_paid').order_by('-completion_date')
+        pulled_out_qs = CustomerHistory.objects.filter(final_status='pulled_out').order_by('-completion_date')
         
-        # Get statistics
+        # Force evaluation inside try so DB errors are caught here (e.g., missing table in prod)
+        fully_paid_customers = list(fully_paid_qs)
+        pulled_out_customers = list(pulled_out_qs)
+        
+        # Get statistics (also evaluated here)
         stats = CustomerHistory.objects.aggregate(
             fully_paid_count=Count('id', filter=Q(final_status='fully_paid')),
             pulled_out_count=Count('id', filter=Q(final_status='pulled_out')),
             fully_paid_total=Sum('total_payments', filter=Q(final_status='fully_paid')),
             pulled_out_total=Sum('total_payments', filter=Q(final_status='pulled_out'))
         )
-    except:
+    except Exception:
         # Fallback if CustomerHistory table doesn't exist yet
         fully_paid_customers = []
         pulled_out_customers = []
