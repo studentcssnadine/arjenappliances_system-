@@ -410,27 +410,17 @@ def admin_dashboard(request):
         if customer.next_due_date == today:
             payments_due_today += 1
     
-    # Today's collections - FIXED: Use empty queryset to avoid migration issue
-    try:
-        today_payments = PaymentRecord.objects.filter(payment_date=today)
-    except Exception as e:
-        # If there's a database error, use empty queryset
-        today_payments = PaymentRecord.objects.none()
-    
+    # Today's collections
+    today_payments = PaymentRecord.objects.filter(payment_date=today)
     today_collections = today_payments.aggregate(total=Sum('amount_paid'))['total'] or Decimal('0.00')
     today_payment_count = today_payments.count()
     
-    # This month's revenue - FIXED: Handle potential database errors
+    # This month's revenue
     month_start = today.replace(day=1)
-    try:
-        month_payments = PaymentRecord.objects.filter(
-            payment_date__gte=month_start,
-            payment_date__lte=today
-        )
-    except Exception as e:
-        month_payments = PaymentRecord.objects.none()
-    
-    month_revenue = month_payments.aggregate(total=Sum('amount_paid'))['total'] or Decimal('0.00')
+    month_revenue = PaymentRecord.objects.filter(
+        payment_date__gte=month_start,
+        payment_date__lte=today
+    ).aggregate(total=Sum('amount_paid'))['total'] or Decimal('0.00')
     
     # Overdue customers
     overdue_customers = []
@@ -438,11 +428,8 @@ def admin_dashboard(request):
         if customer.is_overdue:
             overdue_customers.append(customer)
     
-    # Recent activity - FIXED: Use empty queryset to avoid migration issue
-    try:
-        recent_payments = PaymentRecord.objects.select_related('customer').order_by('-created_at')[:10]
-    except Exception as e:
-        recent_payments = PaymentRecord.objects.none()
+    # Recent activity
+    recent_payments = PaymentRecord.objects.select_related('customer').order_by('-created_at')[:10]
     
     recent_customers = Customer.objects.order_by('-created_at')[:5]
     
@@ -460,18 +447,6 @@ def admin_dashboard(request):
     
     return render(request, 'dashboard/admin_main_dashboard.html', context)
 
-@login_required
-def run_migrations_view(request):
-    """Temporary view to run migrations via HTTP (remove after fixing)"""
-    if request.user.role != 'admin':
-        return JsonResponse({'error': 'Access denied'}, status=403)
-    
-    try:
-        from django.core.management import call_command
-        call_command('migrate')
-        return JsonResponse({'success': 'Migrations completed successfully'})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
 @login_required
 def staff_dashboard(request):
     """Staff dashboard focused on collections - matches staff_dashboard.php exactly"""

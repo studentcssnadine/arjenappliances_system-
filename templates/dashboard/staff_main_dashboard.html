@@ -544,7 +544,13 @@
                                     <span style="color: #6c757d;">—</span>
                                 {% endif %}
                             </td>
-                            <td>{{ payment.recorded_by.full_name|default:payment.recorded_by.username|default:"System" }}</td>
+                            <td>
+                                {% if payment.recorded_by %}
+                                    {{ payment.recorded_by.full_name|default:payment.recorded_by.username }}
+                                {% else %}
+                                    System
+                                {% endif %}
+                            </td>
                             <td>{{ payment.notes|default:"—" }}</td>
                         </tr>
                         {% endfor %}
