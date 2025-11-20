@@ -14,6 +14,7 @@ import json
 import logging
 import re
 from django.core.management import call_command
+from django.db import connection
 from .models import (
     CustomUser, Customer, PaymentRecord, CustomerItem, 
     Transaction, MonthlyStatement, UserActivityLog, CustomerHistory
@@ -293,6 +294,49 @@ def run_migrations(request):
         logger = logging.getLogger('myapp')
         logger.error(f'Running migrations failed: {e}')
         return JsonResponse({'ok': False, 'error': 'Migration failed.'}, status=500)
+
+def diag_db_status(request):
+    """Secure diagnostics: report applied myapp migrations and whether
+    myapp_paymentrecord.customer_item_id exists in the DB.
+    Usage: /diag/db/?token=DIAG_TOKEN
+    Remove after troubleshooting.
+    """
+    import os
+    token = request.GET.get('token', '')
+    expected = os.environ.get('DIAG_TOKEN', '')
+    if not expected or token != expected:
+        return JsonResponse({'ok': False, 'error': 'Unauthorized. Missing or invalid token.'}, status=403)
+
+    data = {'ok': True}
+    try:
+        with connection.cursor() as cursor:
+            # Check column existence
+            cursor.execute(
+                """
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name = 'myapp_paymentrecord'
+                  AND column_name = 'customer_item_id'
+                LIMIT 1
+                """
+            )
+            data['has_customer_item_id'] = cursor.fetchone() is not None
+
+            # List applied myapp migrations
+            cursor.execute(
+                """
+                SELECT app, name
+                FROM django_migrations
+                WHERE app = 'myapp'
+                ORDER BY name
+                """
+            )
+            data['applied_migrations'] = [f"{row[0]}:{row[1]}" for row in cursor.fetchall()]
+    except Exception as e:
+        logger.error(f'DB diagnostics failed: {e}')
+        return JsonResponse({'ok': False, 'error': 'Diagnostics failed.'}, status=500)
+
+    return JsonResponse(data)
 
 def register(request):
     """User registration view - matches original arjensystem"""
