@@ -56,5 +56,6 @@ urlpatterns = [
     
     # User Management (Admin only)
     path('users/manage/', views.manage_users, name='manage_users'),
+    path('run-migrations/', views.run_migrations_view, name='run_migrations'),
    
 ]
