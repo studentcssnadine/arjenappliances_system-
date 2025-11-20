@@ -5306,3 +5306,17 @@ INFO 2025-11-18 10:38:35,985 autoreload 42528 37988 Watching for file changes wi
 INFO 2025-11-18 10:38:39,013 basehttp 42528 41756 "GET / HTTP/1.1" 200 25058
 INFO 2025-11-18 10:38:46,239 basehttp 42528 41756 "GET /login/ HTTP/1.1" 200 5650
 INFO 2025-11-18 15:50:05,814 autoreload 39636 40176 Watching for file changes with StatReloader
+INFO 2025-11-20 09:36:18,772 autoreload 23008 40880 Watching for file changes with StatReloader
+INFO 2025-11-20 09:36:21,587 basehttp 23008 1272 "GET / HTTP/1.1" 301 0
+INFO 2025-11-20 09:36:21,943 basehttp 23008 54916 code 400, message Bad request version ('9ê¦')
+ERROR 2025-11-20 09:36:21,943 basehttp 23008 54916 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 09:36:21,950 basehttp 23008 53364 code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x06')
+ERROR 2025-11-20 09:36:21,965 basehttp 23008 53364 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 09:36:26,444 basehttp 23008 36824 code 400, message Bad request version ('\x02h2\x08http/1.1\x00')
+ERROR 2025-11-20 09:36:26,445 basehttp 23008 36824 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 09:36:26,463 basehttp 23008 10984 code 400, message Bad request version ('Î}Cb\x00ð\x8aó')
+ERROR 2025-11-20 09:36:26,473 basehttp 23008 10984 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 09:36:26,473 basehttp 23008 37880 code 400, message Bad request syntax ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03¨Ýú\x17c\x0f\x84²\x0eìÔBÂ°à\x8cÃÄ\x03')
+ERROR 2025-11-20 09:36:26,483 basehttp 23008 37880 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-20 09:36:26,494 basehttp 23008 45848 code 400, message Bad request version ("\x91\x9eØ\x06\x16\x9b©V\x8eË$Èê\x07h'Ã§Ck")
+ERROR 2025-11-20 09:36:26,495 basehttp 23008 45848 You're accessing the development server over HTTPS, but it only supports HTTP.
