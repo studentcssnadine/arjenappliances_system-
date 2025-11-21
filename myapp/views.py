@@ -3287,7 +3287,13 @@ def customer_payments(request, customer_id):
         customer.active_items = active_items
         
         # Get all payments for this customer (for overall summary and breakdown)
-        payments = PaymentRecord.objects.filter(customer=customer).select_related('customer_item').order_by('payment_date')
+        # Order by payment_date and id to ensure a stable chronological order
+        payments = (
+            PaymentRecord.objects
+            .filter(customer=customer)
+            .select_related('customer_item')
+            .order_by('payment_date', 'id')
+        )
         
         # Calculate payment summary using REAL ITEM DATA (not old customer data)
         total_paid = sum(payment.amount_paid for payment in payments)

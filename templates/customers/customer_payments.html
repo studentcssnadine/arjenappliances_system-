@@ -1409,15 +1409,18 @@
             }
 
             // Add a final summary row showing the remaining balance AFTER all payments
-            // Only if:
-            // 1) there is at least one actual payment,
-            // 2) the item still has a positive remaining balance, and
-            // 3) the LAST payment was NOT a full monthly due (partial last payment).
+            // Only if the last payment is a partial payment and there is still a balance.
+            // Conditions:
+            // 1) at least one actual payment exists
+            // 2) current balance > 0
+            // 3) monthly due > 0
+            // 4) last payment deduction is > 0 but strictly less than monthly due (with tolerance)
             let shouldShowRemainingRow = false;
             if (actualPayments.length > 0 && currentBalance > 0 && monthlyDue > 0) {
                 const lastPayment = actualPayments[actualPayments.length - 1];
-                const lastDeduction = (lastPayment.rawAmount || 0) + (lastPayment.rebateAmount || 0);
-                if (lastDeduction < monthlyDue) {
+                const lastDeduction = ((lastPayment.rawAmount || 0) + (lastPayment.rebateAmount || 0));
+                const tolerance = 0.01; // avoid float rounding issues
+                if (lastDeduction > 0 && (lastDeduction + tolerance) < monthlyDue) {
                     shouldShowRemainingRow = true;
                 }
             }
@@ -1428,7 +1431,7 @@
                 remainingRow.dataset.itemId = itemId;
                 remainingRow.style.backgroundColor = '#fffbe6';
 
-                const remainingBalanceDisplay = '₱' + Math.max(0, currentBalance).toLocaleString('en-US', {minimumFractionDigits: 2});
+                const remainingBalanceDisplay = '₱' + Math.max(0, Number.parseFloat(currentBalance).toFixed(2)).toLocaleString('en-US', {minimumFractionDigits: 2});
 
                 remainingRow.innerHTML = `
                     <td>-</td>
