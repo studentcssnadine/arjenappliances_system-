@@ -1,6 +1,6 @@
 <!-- Remove Customer Modal -->
 <div class="modal-overlay" id="removeCustomerModal">
-    <div class="modal-container" tabindex="-1">
+    <div class="modal-container">
         <div class="modal-header">
             <h3><i class="fas fa-exclamation-triangle"></i> Remove Customer</h3>
             <button type="button" class="modal-close" onclick="closeRemoveCustomerModal()">
@@ -346,18 +346,8 @@ function showRemoveCustomerModal(customerId, customerName) {
     document.getElementById('transactionNumberGroup').style.display = 'block';
     document.getElementById('transaction_number').value = transactionNumber;
     
-    const overlay = document.getElementById('removeCustomerModal');
-    overlay.classList.add('show');
+    document.getElementById('removeCustomerModal').classList.add('show');
     document.body.style.overflow = 'hidden';
-    
-    // Ensure the modal is scrolled to top and focused (prevents feeling "stuck")
-    try {
-        overlay.scrollTop = 0;
-        const container = overlay.querySelector('.modal-container');
-        if (container && typeof container.focus === 'function') {
-            container.focus({ preventScroll: true });
-        }
-    } catch (_) {}
 }
 
 function closeRemoveCustomerModal() {
